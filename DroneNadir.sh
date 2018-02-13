@@ -65,7 +65,7 @@ echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                           
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
-echo "            <AuxStr>  +proj=utm +zone=" $UTM " +ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>      " >> SysUTM.xml
+echo "            <AuxStr>  +proj=utm +zone="$UTM "+ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>      " >> SysUTM.xml
 echo "                                                                                                            " >> SysUTM.xml
 echo "         </BSC>                                                                                             " >> SysUTM.xml
 echo "</SystemeCoord>                                                                                             " >> SysUTM.xml
