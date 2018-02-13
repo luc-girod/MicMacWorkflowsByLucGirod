@@ -1,5 +1,9 @@
+#This file is a workflow for drone images taken at nadir (or close to nadir) containing GNSS location data. It was created and tested using images from a DJI Mavic Pro and should run for all similar drones (other DJI products for instance), and also for more "serious" aerial photography systems.
 
-# add default values for ZoomF, RESTERR, CorThr, water_mask and NoCorDEM
+#I would like to remind users that an along-track overlap of 80% and across track overlap of 60% are the minimum recommended values.
+
+
+# add default values
 EXTENSION=$EXTENSION
 X_OFF=0;
 Y_OFF=0;
@@ -10,8 +14,8 @@ resol_set=false
 while getopts "e:x:y:u:pr:h" opt; do
   case $opt in
     h)
-      echo "Run the second step in the MMASTER processing chain."
-      echo "usage: WorkflowASTER_GT_Pt2.sh -s SCENENAME -z 'UTMZONE' -f ZOOMF -t RESTERR -w false -h"
+      echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
+      echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
       echo "	-e EXTENSION : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
       echo "	-x X_OFF     : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF     : Y (northing) offset for ply file overflow issue (default=0)."
