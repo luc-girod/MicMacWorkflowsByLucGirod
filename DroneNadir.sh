@@ -69,7 +69,7 @@ echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                           
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
 echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
-echo "            <AuxStr>  +proj=utm +zone="$UTM "+ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>      " >> SysUTM.xml
+echo "            <AuxStr>  +proj=utm +zone="$UTM "+ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>        " >> SysUTM.xml
 echo "                                                                                                            " >> SysUTM.xml
 echo "         </BSC>                                                                                             " >> SysUTM.xml
 echo "</SystemeCoord>                                                                                             " >> SysUTM.xml
@@ -107,5 +107,5 @@ mm3d Tawny Ortho-MEC-Malt
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]
 
-gdal_translate -a_srs "+proj=utm +zone=" $UTM " +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
-gdal_translate -a_srs "+proj=utm +zone=" $UTM " +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/Z_Num8_DeZoom2_STD-MALT.tif OUTPUT/DEM_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone="$UTM" +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone="$UTM" +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/Z_Num8_DeZoom2_STD-MALT.tif OUTPUT/DEM_geotif.tif
