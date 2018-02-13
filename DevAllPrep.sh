@@ -6,7 +6,7 @@ do
     f=$(basename "$file")
     #echo "mm3d MpDcraw \"./$f\"  Add16B8B=0  ConsCol=0  ExtensionAbs=None  16B=0  CB=1  NameOut=./Tmp-MM-Dir/"$f"_Ch3.tif Gamma=2.2 EpsLog=1.0" >> DevAll.sh
 	echo "mm3d Devlop \"./$f\" 8B=1 Gray=0 NameOut=./Tmp-MM-Dir/"$f"_Ch3.tif" >> DevAll.sh
+	echo "Found image : " $f
 done  
 
 bash DevAll.sh
-mm3d AllDev .*JPG
