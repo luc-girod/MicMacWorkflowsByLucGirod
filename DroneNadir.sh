@@ -4,24 +4,26 @@
 
 
 # add default values
-EXTENSION=$EXTENSION
+EXTENSION=JPG
 X_OFF=0;
 Y_OFF=0;
 utm_set=false
 do_ply=true
+use_Schnaps=true
 resol_set=false
 
-while getopts "e:x:y:u:pr:h" opt; do
+while getopts "e:x:y:u:s:pr:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
-      echo "	-e EXTENSION : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
-      echo "	-x X_OFF     : X (easting) offset for ply file overflow issue (default=0)."
-      echo "	-y Y_OFF     : Y (northing) offset for ply file overflow issue (default=0)."
-      echo "	-u UTMZONE   : UTM Zone of area of interest. Takes form 'NN +north(south)'"
-      echo "	-p do_ply    : export ply file (default=true)."
-      echo "	-r RESOL     : Ground resolution (in meters)"
+      echo "	-e EXTENSION   : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
+      echo "	-x X_OFF       : X (easting) offset for ply file overflow issue (default=0)."
+      echo "	-y Y_OFF       : Y (northing) offset for ply file overflow issue (default=0)."
+      echo "	-u UTMZONE     : UTM Zone of area of interest. Takes form 'NN +north(south)'"
+      echo "	-s SH          : Use 'Schnaps' optimised homologous points (default=true)."
+      echo "	-p do_ply      : export ply file (default=true)."
+      echo "	-r RESOL       : Ground resolution (in meters)"
       echo "	-h	  : displays this message and exits."
       echo " "
       exit 0
@@ -36,6 +38,9 @@ while getopts "e:x:y:u:pr:h" opt; do
 	u)
       RESOL=$OPTARG
       resol_set=true
+      ;; 
+	s)
+      use_Schnaps=$OPTARG
       ;;    
 	x)
       X_OFF=$OPTARG
@@ -60,7 +65,13 @@ if [!utm_set]; then
 	echo "UTM zone not set"
 	exit 1
 fi
-
+if [use_schnaps]; then
+	echo "Using Schnaps!"
+	SH="_mini"
+else
+	echo "Not using Schnaps!"
+	SH=""
+fi
 #create UTM file (after deleting any existing one)
 rm SysUTM.xml
 echo "<SystemeCoord>                                                                                              " >> SysUTM.xml
@@ -82,16 +93,18 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 mm3d Tapioca File FileImagesNeighbour.xml 2000
-#filter TiePoints (better distribution, avoid clogging)
-mm3d Schnaps .*$EXTENSION
+if [use_schnaps]; then
+	#filter TiePoints (better distribution, avoid clogging)
+	mm3d Schnaps .*$EXTENSION
+fi
 #Compute Relative orientation (Arbitrary system)
-mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH="_mini"
+mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 #Visualize relative orientation
 mm3d AperiCloud .*$EXTENSION Ori-Arbitrary
 #Transform to  RTL system
 mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
-mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH="_mini"
+mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH
 #Visualize Ground_RTL orientation
 mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL
 #Change system to final cartographic system
