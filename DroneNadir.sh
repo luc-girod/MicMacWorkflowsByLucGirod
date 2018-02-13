@@ -57,7 +57,8 @@ if [!utm_set]; then
 	exit 1
 fi
 
-#create UTM file
+#create UTM file (after deleting any existing one)
+rm SysUTM.xml
 echo "<SystemeCoord>                                                                                              " >> SysUTM.xml
 echo "         <BSC>                                                                                              " >> SysUTM.xml
 echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                                                             " >> SysUTM.xml
