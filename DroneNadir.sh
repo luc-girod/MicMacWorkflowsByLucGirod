@@ -87,7 +87,7 @@ mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 #Correlation into DEM
-if resol_set
+if [resol_set]; then
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1
 else
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1
