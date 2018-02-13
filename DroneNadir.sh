@@ -1,12 +1,13 @@
-utm_set=0
+
 # add default values for ZoomF, RESTERR, CorThr, water_mask and NoCorDEM
 EXTENSION=$EXTENSION
 X_OFF=0;
 Y_OFF=0;
+utm_set=false
 do_ply=true
 resol_set=false
 
-while getopts "e:x:y:pu:r:h" opt; do
+while getopts "e:x:y:u:pr:h" opt; do
   case $opt in
     h)
       echo "Run the second step in the MMASTER processing chain."
@@ -14,8 +15,8 @@ while getopts "e:x:y:pu:r:h" opt; do
       echo "	-e EXTENSION : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
       echo "	-x X_OFF     : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF     : Y (northing) offset for ply file overflow issue (default=0)."
-      echo "	-p do_ply    : export ply file (default=true)."
       echo "	-u UTMZONE   : UTM Zone of area of interest. Takes form 'NN +north(south)'"
+      echo "	-p do_ply    : export ply file (default=true)."
       echo "	-r RESOL     : Ground resolution (in meters)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -26,11 +27,11 @@ while getopts "e:x:y:pu:r:h" opt; do
       ;;
 	u)
       UTM=$OPTARG
-      utm_set=1
+      utm_set=true
       ;;  
 	u)
       RESOL=$OPTARG
-      resol_set=1
+      resol_set=true
       ;;    
 	x)
       X_OFF=$OPTARG
@@ -51,6 +52,10 @@ while getopts "e:x:y:pu:r:h" opt; do
       ;;
   esac
 done
+if [!utm_set]; then
+	echo "UTM zone not set"
+	exit 1
+fi
 
 #create UTM file
 echo "<SystemeCoord>                                                                                              " >> SysUTM.xml
