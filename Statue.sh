@@ -14,7 +14,7 @@ while getopts "e:sz:h" opt; do
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
       echo "	-e EXTENSION   : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
-      echo "	-s SH          : Do not use 'Schnaps' optimised homologous points."
+      echo "	-s             : Do not use 'Schnaps' optimised homologous points."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -40,7 +40,7 @@ while getopts "e:sz:h" opt; do
   esac
 done
 
-if [ "$use_schnaps" = true ]; then
+if [ "$use_Schnaps" = true ]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else
@@ -51,7 +51,7 @@ fi
 #Find Tie points using multi-resolution
 mm3d Tapioca MulScale .*$EXTENSION 500 2000
 
-if [ "$use_schnaps" = true ]; then
+if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
 	mm3d Schnaps .*$EXTENSION
 fi
