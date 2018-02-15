@@ -1,6 +1,7 @@
 #Script to force single core convertion off all images into RGB tifs (somethime AperiCloud fails on machines with many cores, trying to convert too many images at the same time)
 nbIm=0
 mkdir Tmp-MM-Dir
+rm DevAll.sh
 find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\)" | while read file;
 do
 	nbIm=$((nbIm + 1)) 
