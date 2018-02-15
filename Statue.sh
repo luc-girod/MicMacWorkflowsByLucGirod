@@ -5,17 +5,16 @@
 
 # add default values
 EXTENSION=JPG
-do_ply=true
 use_Schnaps=true
 ZOOM=2
 
-while getopts "e:s:z:h" opt; do
+while getopts "e:sz:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
       echo "	-e EXTENSION   : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
-      echo "	-s SH          : Use 'Schnaps' optimised homologous points (default=true)."
+      echo "	-s SH          : Do not use 'Schnaps' optimised homologous points."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -28,7 +27,7 @@ while getopts "e:s:z:h" opt; do
       ZOOM=$OPTARG
       ;;
 	s)
-      use_Schnaps=$OPTARG
+      use_Schnaps=false
       ;;  
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -41,7 +40,7 @@ while getopts "e:s:z:h" opt; do
   esac
 done
 
-if [$use_schnaps]; then
+if [ "$use_schnaps" = true ]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else
@@ -51,7 +50,8 @@ fi
 
 #Find Tie points using multi-resolution
 mm3d Tapioca MulScale .*$EXTENSION 500 2000
-if [use_schnaps]; then
+
+if [ "$use_schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
 	mm3d Schnaps .*$EXTENSION
 fi

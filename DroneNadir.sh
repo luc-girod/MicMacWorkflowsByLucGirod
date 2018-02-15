@@ -21,8 +21,8 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       echo "	-x X_OFF       : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF       : Y (northing) offset for ply file overflow issue (default=0)."
       echo "	-u UTMZONE     : UTM Zone of area of interest. Takes form 'NN +north(south)'"
-      echo "	-s SH          : Use 'Schnaps' optimised homologous points (default=true)."
-      echo "	-p do_ply      : export ply file (default=true)."
+      echo "	-s SH          : Do not use 'Schnaps' optimised homologous points."
+      echo "	-p do_ply      : do not export ply file."
       echo "	-r RESOL       : Ground resolution (in meters)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -40,7 +40,7 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       resol_set=true
       ;; 
 	s)
-      use_Schnaps=$OPTARG
+      use_Schnaps=false
       ;;    
 	x)
       X_OFF=$OPTARG
@@ -49,7 +49,7 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       Y_OFF=$OPTARG
       ;;	
     p)
-      do_ply=$OPTARG
+      do_ply=false
       ;;
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -61,11 +61,11 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       ;;
   esac
 done
-if [!$utm_set]; then
+if [ "$utm_set" = false ]; then
 	echo "UTM zone not set"
 	exit 1
 fi
-if [$use_schnaps]; then
+if [ "$use_schnaps" = true ]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else
@@ -93,7 +93,7 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 mm3d Tapioca File FileImagesNeighbour.xml 2000
-if [$use_schnaps]; then
+if [ "$use_schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
 	mm3d Schnaps .*$EXTENSION
 fi
@@ -110,7 +110,7 @@ mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 #Correlation into DEM
-if [$resol_set]; then
+if [ "$resol_set" = true ]; then
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1
 else
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1
