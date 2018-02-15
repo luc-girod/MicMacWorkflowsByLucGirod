@@ -41,7 +41,7 @@ while getopts "e:s:z:h" opt; do
   esac
 done
 
-if [use_schnaps]; then
+if [$use_schnaps]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else

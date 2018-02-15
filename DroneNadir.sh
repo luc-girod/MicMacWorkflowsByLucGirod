@@ -61,11 +61,11 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       ;;
   esac
 done
-if [!utm_set]; then
+if [!$utm_set]; then
 	echo "UTM zone not set"
 	exit 1
 fi
-if [use_schnaps]; then
+if [$use_schnaps]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else
