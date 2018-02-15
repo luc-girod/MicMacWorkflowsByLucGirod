@@ -1,13 +1,17 @@
-<Global>
+
+<!-- This file is a template for defining cameras for image files that don't have metadata about (sensore size/focal length) or Foc35mmEq data -->
+	
+<Global>	
   <ChantierDescripteur >
 
 	<!-- Define a camera model (name and sensor/film size) -->
     <LocCamDataBase>
         <CameraEntry>
               <Name> aManualCam </Name>
-              <SzCaptMm>  3.76 2.74 </SzCaptMm> <!-- MidSideFiducials or "MaxFidX-MinFidX MaxFidY-MinFidY"-->
+              <SzCaptMm>  3.76 2.74 </SzCaptMm> <!-- Size of sensore (digital) or for analog, scanned film : MidSideFiducials or "MaxFidX-MinFidX MaxFidY-MinFidY"-->
               <ShortName> aManualCam </ShortName>
-         </CameraEntry>
+         </CameraEntry>		 
+		<!-- Add more <CameraEntry> if more cameras -->
     </LocCamDataBase>
 	
 	<KeyedNamesAssociations>
@@ -18,6 +22,7 @@
                        <CalcName> aManualCam </CalcName> <!-- Name of the camera for these images -->
                  </Direct>
              </Calcs>
+			<!-- Add more <Calcs> if more cameras -->
              <Key>   NKS-Assoc-STD-CAM </Key>
     </KeyedNamesAssociations>
 	
@@ -29,6 +34,7 @@
                        <CalcName> 3.6 </CalcName>	<!-- See calibration report -->
                  </Direct>
              </Calcs>
+			<!-- Add more <Calcs> for all different focals -->
              <Key>   NKS-Assoc-STD-FOC  </Key>
     </KeyedNamesAssociations>
 	
