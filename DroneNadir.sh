@@ -93,7 +93,7 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 mm3d Tapioca File FileImagesNeighbour.xml 2000
-if [use_schnaps]; then
+if [$use_schnaps]; then
 	#filter TiePoints (better distribution, avoid clogging)
 	mm3d Schnaps .*$EXTENSION
 fi
@@ -110,7 +110,7 @@ mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 #Correlation into DEM
-if [resol_set]; then
+if [$resol_set]; then
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1
 else
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1
