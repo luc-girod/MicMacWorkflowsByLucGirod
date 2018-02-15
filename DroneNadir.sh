@@ -35,7 +35,7 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       UTM=$OPTARG
       utm_set=true
       ;;  
-	u)
+	r)
       RESOL=$OPTARG
       resol_set=true
       ;; 
