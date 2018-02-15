@@ -17,7 +17,7 @@ while getopts "e:x:y:u:s:pr:h" opt; do
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
-      echo "	-e EXTENSION   : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
+      echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-x X_OFF       : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF       : Y (northing) offset for ply file overflow issue (default=0)."
       echo "	-u UTMZONE     : UTM Zone of area of interest. Takes form 'NN +north(south)'"
