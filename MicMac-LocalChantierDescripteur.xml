@@ -1,0 +1,37 @@
+<Global>
+  <ChantierDescripteur >
+
+	<!-- Define a camera model (name and sensor/film size) -->
+    <LocCamDataBase>
+        <CameraEntry>
+              <Name> aManualCam </Name>
+              <SzCaptMm>  3.76 2.74 </SzCaptMm> <!-- MidSideFiducials or "MaxFidX-MinFidX MaxFidY-MinFidY"-->
+              <ShortName> aManualCam </ShortName>
+         </CameraEntry>
+    </LocCamDataBase>
+	
+	<KeyedNamesAssociations>
+            <Calcs>
+                 <Arrite>  1 1 </Arrite>
+                 <Direct>
+                       <PatternTransform> .*  </PatternTransform> <!-- Regular expressions of the group of images with the following camera model -->
+                       <CalcName> aManualCam </CalcName> <!-- Name of the camera for these images -->
+                 </Direct>
+             </Calcs>
+             <Key>   NKS-Assoc-STD-CAM </Key>
+    </KeyedNamesAssociations>
+	
+	    <KeyedNamesAssociations>
+            <Calcs>
+                 <Arrite>  1 1 </Arrite>
+                 <Direct>
+                       <PatternTransform> .*  </PatternTransform> <!-- Regular expressions of the group of images with the following focal length -->
+                       <CalcName> 3.6 </CalcName>	<!-- See calibration report -->
+                 </Direct>
+             </Calcs>
+             <Key>   NKS-Assoc-STD-FOC  </Key>
+    </KeyedNamesAssociations>
+	
+	
+  </ChantierDescripteur>
+</Global>
