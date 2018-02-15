@@ -100,7 +100,7 @@ fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 #Visualize relative orientation
-mm3d AperiCloud .*$EXTENSION Ori-Arbitrary
+mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
 #Transform to  RTL system
 mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)

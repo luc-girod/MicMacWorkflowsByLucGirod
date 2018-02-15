@@ -58,7 +58,7 @@ fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 #Visualize relative orientation
-mm3d AperiCloud .*$EXTENSION Ori-Arbitrary
+mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH
 
 #HERE, MASKING COULD BE DONE!!!
 
