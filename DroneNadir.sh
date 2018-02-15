@@ -95,7 +95,7 @@ mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWG
 mm3d Tapioca File FileImagesNeighbour.xml 2000
 if [ "$use_schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
-	mm3d Schnaps .*$EXTENSION
+	mm3d Schnaps .*$EXTENSION MoveBadImgs=1
 fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH

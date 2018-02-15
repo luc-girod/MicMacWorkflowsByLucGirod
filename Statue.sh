@@ -53,7 +53,7 @@ mm3d Tapioca MulScale .*$EXTENSION 500 2000
 
 if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
-	mm3d Schnaps .*$EXTENSION
+	mm3d Schnaps .*$EXTENSION MoveBadImgs=1
 fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
