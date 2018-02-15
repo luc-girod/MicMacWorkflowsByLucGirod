@@ -6,15 +6,17 @@
 # add default values
 EXTENSION=JPG
 use_Schnaps=true
+wait_for_mask=false
 ZOOM=2
 
-while getopts "e:sz:h" opt; do
+while getopts "e:smz:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
       echo "	-e EXTENSION   : image file type ($EXTENSION, $EXTENSION, TIF, png..., default=$EXTENSION)."
-      echo "	-s             : Do not use 'Schnaps' optimised homologous points."
+      echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
+      echo "	-m             : Pause for Mask before correlation (does not by default)."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -28,6 +30,9 @@ while getopts "e:sz:h" opt; do
       ;;
 	s)
       use_Schnaps=false
+      ;; 
+	m)
+      wait_for_mask=true
       ;;  
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -61,6 +66,14 @@ mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH
 
 #HERE, MASKING COULD BE DONE!!!
-
+if [ "$wait_for_mask" = true ]; then
+	read -p "Please create mask now"
+fi
+	
 #Do the correlation of the images
-mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM 
+if [ "$use_Schnaps" = true ]; then
+	mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary__mini.ply
+else
+	mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary.ply
+fi
+
