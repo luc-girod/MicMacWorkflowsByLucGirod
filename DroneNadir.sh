@@ -106,7 +106,7 @@ mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
 mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH
 #Visualize Ground_RTL orientation
-mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL
+mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 #Correlation into DEM
