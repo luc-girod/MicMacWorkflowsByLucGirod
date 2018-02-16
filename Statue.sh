@@ -67,7 +67,7 @@ mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH
 
 #HERE, MASKING COULD BE DONE!!!
 if [ "$wait_for_mask" = true ]; then
-	read -p "Please create mask now"
+	read -rsp $'Press any key to continue...\n' -n1 key
 fi
 	
 #Do the correlation of the images
