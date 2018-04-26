@@ -17,8 +17,9 @@ do_AperiCloud=true
 use_Schnaps=true
 resol_set=false
 ZoomF=2
+obliqueFolder=none
 
-while getopts "e:x:y:u:s:par:z:h" opt; do
+while getopts "e:x:y:u:s:pao:r:z:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -30,6 +31,7 @@ while getopts "e:x:y:u:s:par:z:h" opt; do
       echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
       echo "	-p do_ply        : use to NOT export ply file."
       echo "	-a do_AperiCloud : use to NOT export AperiCloud file."
+      echo "	-o obliqueFolder : Folder with oblique imagery to help orientation (will be entierely copied then deleted during process)."
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
       echo "	-h	             : displays this message and exits."
@@ -56,6 +58,9 @@ while getopts "e:x:y:u:s:par:z:h" opt; do
     a)
       do_AperiCloud=false
       ;; 
+	o)
+      obliqueFolder=$OPTARG
+      ;;
 	x)
       X_OFF=$OPTARG
       ;;	
@@ -99,6 +104,12 @@ echo "                                                                          
 echo "         </BSC>                                                                                             " >> SysUTM.xml
 echo "</SystemeCoord>                                                                                             " >> SysUTM.xml
 
+
+#Copy everything from the folder with oblique images
+if [ "obliqueFolder" != none ]; then
+	cp $obliqueFolder/* .
+fi
+
 #Convert all images to tif (BW and RGB) for use in AperiCloud (because it otherwise breaks if too many CPUs are used)
 if [ "$do_AperiCloud" = true ]; then
 	DevAllPrep.sh
@@ -138,16 +149,24 @@ mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 #Print out a text file with the camera positions (for use in external software, e.g. GIS)
 mm3d OriExport Ori-Ground_UTM/.*xml CameraPositionsUTM.txt AddF=1
 
+#Taking away files from the oblique folder
+if [ "$obliqueFolder" != none ]; then	
+	here=$(pwd)
+	cd $obliqueFolder	
+	find ./ -type f -name "*" | while read filename; do
+		f=$(basename "$filename")
+		rm  $here/$f
+	done	
+	cd $here	
+fi
+
+
 #Correlation into DEM
 if [ "$resol_set" = true ]; then
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
 else
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
 fi
-# WARNING:  take away images from oblique flight for the dem and ortho generation
-
-
-
 
 #Mosaic from individual orthos
 mm3d Tawny Ortho-MEC-Malt
@@ -162,7 +181,7 @@ finalcors=($(ls Correl_STD-MALT_Num*.tif))
 DEMind=$((${#finalDEMs[@]}-1))
 corind=$((${#finalcors[@]}-1))
 lastDEM=${finalDEMs[DEMind]}
-lastcor=${finalmsks[corind]}
+lastcor=${finalcors[corind]}
 laststr="${lastDEM%.*}"
 corrstr="${lastcor%.*}"
 cp $laststr.tfw $corrstr.tfw
