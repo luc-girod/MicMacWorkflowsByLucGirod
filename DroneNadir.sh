@@ -2,6 +2,10 @@
 
 #I would like to remind users that an along-track overlap of 80% and across track overlap of 60% are the minimum recommended values.
 
+# example:
+# ./DroneNadir.sh -e JPG -u "32 +north" -r 0.1
+
+
 
 # add default values
 EXTENSION=JPG
@@ -11,8 +15,9 @@ utm_set=false
 do_ply=true
 use_Schnaps=true
 resol_set=false
+ZoomF=2
 
-while getopts "e:x:y:u:s:pr:h" opt; do
+while getopts "e:x:y:u:s:pr:z:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -24,6 +29,7 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       echo "	-s SH          : Do not use 'Schnaps' optimised homologous points."
       echo "	-p do_ply      : do not export ply file."
       echo "	-r RESOL       : Ground resolution (in meters)"
+      echo "	-z ZoomF       : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
       echo "	-h	  : displays this message and exits."
       echo " "
       exit 0
@@ -41,15 +47,18 @@ while getopts "e:x:y:u:s:pr:h" opt; do
       ;; 
 	s)
       use_Schnaps=false
-      ;;    
+      ;;   	
+    p)
+      do_ply=false
+      ;; 
 	x)
       X_OFF=$OPTARG
       ;;	
 	y)
       Y_OFF=$OPTARG
       ;;	
-    p)
-      do_ply=false
+	z)
+      ZoomF=$OPTARG
       ;;
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -99,7 +108,8 @@ if [ "$use_schnaps" = true ]; then
 fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
-#Visualize relative orientation
+
+#Visualize relative orientation, if apericloud is not working, run DevAllPrep.sh
 mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
 #Transform to  RTL system
 mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
@@ -109,12 +119,19 @@ mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree
 mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
+
+
 #Correlation into DEM
 if [ "$resol_set" = true ]; then
-	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1
+	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
 else
-	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1
+	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
 fi
+# WARNING:  take away images from oblique flight for the dem and ortho generation
+
+
+
+
 #Mosaic from individual orthos
 mm3d Tawny Ortho-MEC-Malt
 #Making OUTPUT folder
@@ -122,5 +139,11 @@ mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]
 
+cd MEC-Malt
+finalDEMs=($(ls Z_Num*_DeZoom*_STD-MALT.tif))
+DEMind=$((${#finalDEMs[@]}-1))
+lastDEM=${finalDEMs[DEMind]}
+cd ..
+
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
-gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/Z_Num8_DeZoom2_STD-MALT.tif OUTPUT/DEM_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
