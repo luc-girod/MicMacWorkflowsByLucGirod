@@ -135,6 +135,8 @@ fi
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 
+#Print out a text file with the camera positions (for use in external software, e.g. GIS)
+mm3d OriExport Ori-Ground_UTM/.*xml CameraPositionsUTM.txt AddF=1
 
 #Correlation into DEM
 if [ "$resol_set" = true ]; then
@@ -156,9 +158,16 @@ mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Ort
 
 cd MEC-Malt
 finalDEMs=($(ls Z_Num*_DeZoom*_STD-MALT.tif))
+finalcors=($(ls Correl_STD-MALT_Num*.tif))
 DEMind=$((${#finalDEMs[@]}-1))
+corind=$((${#finalcors[@]}-1))
 lastDEM=${finalDEMs[DEMind]}
+lastcor=${finalmsks[corind]}
+laststr="${lastDEM%.*}"
+corrstr="${lastcor%.*}"
+cp $laststr.tfw $corrstr.tfw
 cd ..
 
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
