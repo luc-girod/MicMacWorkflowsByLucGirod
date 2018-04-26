@@ -13,24 +13,26 @@ X_OFF=0;
 Y_OFF=0;
 utm_set=false
 do_ply=true
+do_AperiCloud=true
 use_Schnaps=true
 resol_set=false
 ZoomF=2
 
-while getopts "e:x:y:u:s:pr:z:h" opt; do
+while getopts "e:x:y:u:s:par:z:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
-      echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
-      echo "	-x X_OFF       : X (easting) offset for ply file overflow issue (default=0)."
-      echo "	-y Y_OFF       : Y (northing) offset for ply file overflow issue (default=0)."
-      echo "	-u UTMZONE     : UTM Zone of area of interest. Takes form 'NN +north(south)'"
-      echo "	-s SH          : Do not use 'Schnaps' optimised homologous points."
-      echo "	-p do_ply      : do not export ply file."
-      echo "	-r RESOL       : Ground resolution (in meters)"
-      echo "	-z ZoomF       : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
-      echo "	-h	  : displays this message and exits."
+      echo "	-e EXTENSION     : image file type (JPG, jpg, TIF, png..., default=JPG)."
+      echo "	-x X_OFF         : X (easting) offset for ply file overflow issue (default=0)."
+      echo "	-y Y_OFF         : Y (northing) offset for ply file overflow issue (default=0)."
+      echo "	-u UTMZONE       : UTM Zone of area of interest. Takes form 'NN +north(south)'"
+      echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
+      echo "	-p do_ply        : use to NOT export ply file."
+      echo "	-a do_AperiCloud : use to NOT export AperiCloud file."
+      echo "	-r RESOL         : Ground resolution (in meters)"
+      echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
+      echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
       ;;   
@@ -50,6 +52,9 @@ while getopts "e:x:y:u:s:pr:z:h" opt; do
       ;;   	
     p)
       do_ply=false
+      ;; 
+    a)
+      do_AperiCloud=false
       ;; 
 	x)
       X_OFF=$OPTARG
@@ -94,6 +99,11 @@ echo "                                                                          
 echo "         </BSC>                                                                                             " >> SysUTM.xml
 echo "</SystemeCoord>                                                                                             " >> SysUTM.xml
 
+#Convert all images to tif (BW and RGB) for use in AperiCloud (because it otherwise breaks if too many CPUs are used)
+if [ "$do_AperiCloud" = true ]; then
+	DevAllPrep.sh
+fi
+
 #Get the GNSS data out of the images and convert it to a txt file (GpsCoordinatesFromExif.txt)
 mm3d XifGps2Txt .*$EXTENSION
 #Get the GNSS data out of the images and convert it to a xml orientation folder (Ori-RAWGNSS), also create a good RTL (Local Radial Tangential) system.
@@ -109,14 +119,19 @@ fi
 #Compute Relative orientation (Arbitrary system)
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 
-#Visualize relative orientation, if apericloud is not working, run DevAllPrep.sh
-mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
+#Visualize relative orientation, if apericloud is not working, run 
+if [ "$do_AperiCloud" = true ]; then
+	mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
+fi
+
 #Transform to  RTL system
 mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
 mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH
 #Visualize Ground_RTL orientation
-mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
+if [ "$do_AperiCloud" = true ]; then
+	mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
+fi
 #Change system to final cartographic system
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 
