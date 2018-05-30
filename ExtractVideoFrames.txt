@@ -1,0 +1,4 @@
+ffmpeg -ss StartTime -i #VIDEO_NAME# -vframes #NUMBER_OF_FRAMES# #NAME#_%04d.png
+Images are png because ffmpeg is brutal when compressing jpg.
+Example :
+ffmpeg -ss 00:13:52.000 -i MyVideo.mp4 -vframes 150 MyImages_%04d.png
