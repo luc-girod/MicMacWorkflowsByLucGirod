@@ -2,3 +2,10 @@ ffmpeg -ss StartTime -i #VIDEO_NAME# -vframes #NUMBER_OF_FRAMES# #NAME#_%04d.png
 Images are png because ffmpeg is brutal when compressing jpg.
 Example :
 ffmpeg -ss 00:13:52.000 -i MyVideo.mp4 -vframes 150 MyImages_%04d.png
+
+Or if not all image from that timestamp need to be wextracted
+
+ffmpeg -ss StartTime -vf fps=#Frames per second# -t #Duration# -i #VIDEO_NAME#  #NAME#_%04d.png
+
+Example grabbing 2 images per second for 1 min and 10 sec :
+ffmpeg -ss 00:05:48.000 -vf fps=2 -t 00:01:10.000 -i MyVideo.mp4 MyImages_%04d.png
