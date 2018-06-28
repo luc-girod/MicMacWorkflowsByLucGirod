@@ -2,7 +2,7 @@
 nbIm=0
 mkdir Tmp-MM-Dir
 rm DevAll.sh
-find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\RW2\)" | while read file;
+find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\|RW2\)" | while read file;
 do
 	nbIm=$((nbIm + 1)) 
     f=$(basename "$file")
