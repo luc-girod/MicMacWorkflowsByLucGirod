@@ -84,7 +84,7 @@ if [ "$utm_set" = false ]; then
 	echo "UTM zone not set"
 	exit 1
 fi
-if [ "$use_schnaps" = true ]; then
+if [ "$use_Schnaps" = true ]; then
 	echo "Using Schnaps!"
 	SH="_mini"
 else
