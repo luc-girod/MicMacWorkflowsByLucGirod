@@ -123,7 +123,7 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 mm3d Tapioca File FileImagesNeighbour.xml 2000
-if [ "$use_schnaps" = true ]; then
+if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
 	mm3d Schnaps .*$EXTENSION MoveBadImgs=1
 fi
