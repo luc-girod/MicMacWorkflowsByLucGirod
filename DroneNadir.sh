@@ -18,8 +18,9 @@ use_Schnaps=true
 resol_set=false
 ZoomF=2
 obliqueFolder=none
+regul=0
 
-while getopts "e:x:y:u:spao:r:z:h" opt; do
+while getopts "e:x:y:u:speao:r:z:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -30,6 +31,7 @@ while getopts "e:x:y:u:spao:r:z:h" opt; do
       echo "	-u UTMZONE       : UTM Zone of area of interest. Takes form 'NN +north(south)'"
       echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
       echo "	-p do_ply        : use to NOT export ply file."
+      echo "	-c regul         : use to activate color equalization in mosaicking (only do with good camera, eg NOT DJI)."
       echo "	-a do_AperiCloud : use to NOT export AperiCloud file."
       echo "	-o obliqueFolder : Folder with oblique imagery to help orientation (will be entierely copied then deleted during process)."
       echo "	-r RESOL         : Ground resolution (in meters)"
@@ -54,6 +56,9 @@ while getopts "e:x:y:u:spao:r:z:h" opt; do
       ;;   	
     p)
       do_ply=false
+      ;;   	
+    c)
+      regul=1
       ;; 
     a)
       do_AperiCloud=false
@@ -165,11 +170,12 @@ fi
 if [ "$resol_set" = true ]; then
 	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
 else
-	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
+	mm3d Malt Ortho ".*.$EXTENSION" Ground_UT
+M EZA=1 ZoomF=$ZoomF
 fi
 
 #Mosaic from individual orthos
-mm3d Tawny Ortho-MEC-Malt
+mm3d Tawny Ortho-MEC-Malt RegulEgal=$regul
 #Making OUTPUT folder
 mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
