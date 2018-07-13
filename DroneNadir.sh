@@ -175,7 +175,7 @@ M EZA=1 ZoomF=$ZoomF
 fi
 
 #Mosaic from individual orthos
-mm3d Tawny Ortho-MEC-Malt RegulEgal=$regul
+mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul
 #Making OUTPUT folder
 mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
