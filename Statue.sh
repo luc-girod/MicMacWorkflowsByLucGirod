@@ -53,6 +53,10 @@ else
 	SH=""
 fi
 
+#Convert all images to tif (BW and RGB) for use in AperiCloud (because it otherwise breaks if too many CPUs are used)
+DevAllPrep.sh
+
+
 #Find Tie points using multi-resolution
 mm3d Tapioca MulScale .*$EXTENSION 500 2000
 
