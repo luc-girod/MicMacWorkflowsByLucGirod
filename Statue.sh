@@ -1,4 +1,7 @@
-#This file is a workflow for modeling a statue, with images taken from around it.
+# MicMac workflow for modeling a statue, with images taken from around it, not necessarily in an orderly manner.
+#
+# Luc Girod, University of Oslo - luc.girod@geo.uio.no
+
 
 #I would like to remind users that an angle of 10° between view angle is optimal.
 

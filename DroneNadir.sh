@@ -1,3 +1,9 @@
+#Workflow MICMAC for nadir drone survey
+#
+# Luc Girod, University of Oslo - luc.girod@geo.uio.no
+
+
+
 #This file is a workflow for drone images taken at nadir (or close to nadir) containing GNSS location data. It was created and tested using images from a DJI Mavic Pro and should run for all similar drones (other DJI products for instance), and also for more "serious" aerial photography systems.
 
 #I would like to remind users that an along-track overlap of 80% and across track overlap of 60% are the minimum recommended values.

@@ -1,4 +1,7 @@
 #Script to force single core convertion off all images into RGB tifs (somethime AperiCloud fails on machines with many cores, trying to convert too many images at the same time)
+#
+# Luc Girod, University of Oslo - luc.girod@geo.uio.no
+
 nbIm=0
 mkdir Tmp-MM-Dir
 rm DevAll.sh

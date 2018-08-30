@@ -1,3 +1,7 @@
+# Cheat sheet for video frame extraction with ffmpeg
+#
+# Luc Girod, University of Oslo - luc.girod@geo.uio.no
+
 Extract all #NUMBER_OF_FRAMES# frames from timestamp #StartTime#
 ffmpeg -ss #StartTime# -i #VIDEO_NAME# -vframes #NUMBER_OF_FRAMES# #NAME#_%04d.png
 
