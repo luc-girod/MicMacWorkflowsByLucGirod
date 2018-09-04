@@ -17,7 +17,7 @@ while getopts "e:scmz:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
-      echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
+      echo "usage: Statue.sh -e JPG -m"
       echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
       echo "	-c             : Use Tapioca Line Circ=1 (if images are taken in a circle, def false -> Tapioca Mulscale)."
@@ -43,11 +43,11 @@ while getopts "e:scmz:h" opt; do
       wait_for_mask=true
       ;;  
     \?)
-      echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
+      echo "Statue.sh: Invalid option: -$OPTARG" >&1
       exit 1
       ;;
     :)
-      echo "DroneNadir.sh: Option -$OPTARG requires an argument." >&1
+      echo "Statue.sh: Option -$OPTARG requires an argument." >&1
       exit 1
       ;;
   esac
