@@ -73,7 +73,7 @@ DevAllPrep.sh
 if [ "$use_Circ" = true ]; then
 	echo "Using Tapioca Circ .* 2000 8 Circ=1"
 	mm3d Tapioca Line .*$EXTENSION 2000 8 Circ=1
-else if [ "$use_Line" = true ]; then
+elif [ "$use_Line" = true ]; then
 	echo "Using Tapioca Circ .* 2000 8"
 	mm3d Tapioca Line .*$EXTENSION 2000 8
 else
