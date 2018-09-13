@@ -13,14 +13,15 @@ use_Circ=false
 wait_for_mask=false
 ZOOM=2
 
-while getopts "e:scmz:h" opt; do
+while getopts "e:slcmz:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: Statue.sh -e JPG -m"
       echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
-      echo "	-c             : Use Tapioca Line Circ=1 (if images are taken in a circle, def false -> Tapioca Mulscale)."
+      echo "	-l             : Use Tapioca Line (if images are taken in a line, def false -> Tapioca Mulscale)."
+      echo "	-c             : Use Tapioca Line Circ=1 (if images are taken in a circle (if last image is linked with first), def false -> Tapioca Mulscale)."
       echo "	-m             : Pause for Mask before correlation (does not by default)."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
@@ -36,8 +37,11 @@ while getopts "e:scmz:h" opt; do
 	s)
       use_Schnaps=false
       ;; 
-	s)
+	c)
       use_Circ=true
+      ;; 
+	l)
+      use_Line=true
       ;; 
 	m)
       wait_for_mask=true
@@ -67,8 +71,11 @@ DevAllPrep.sh
 
 #Find Tie points using multi-resolution
 if [ "$use_Circ" = true ]; then
+	echo "Using Tapioca Circ .* 2000 8 Circ=1"
+	mm3d Tapioca Line .*$EXTENSION 2000 8 Circ=1
+else if [ "$use_Line" = true ]; then
 	echo "Using Tapioca Circ .* 2000 8"
-	mm3d Tapioca Circ .*$EXTENSION 2000 8
+	mm3d Tapioca Line .*$EXTENSION 2000 8
 else
 	echo "Using Tapioca MulScale .* 500 2000"
 	mm3d Tapioca MulScale .*$EXTENSION 500 2000
