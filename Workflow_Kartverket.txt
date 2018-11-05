@@ -1,0 +1,59 @@
+UTM="32 +north"
+
+rm SysUTM.xml
+echo "<SystemeCoord>                                                                                              " >> SysUTM.xml
+echo "         <BSC>                                                                                              " >> SysUTM.xml
+echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                                                             " >> SysUTM.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
+echo "            <AuxStr>  +proj=utm +zone="$UTM "+ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>        " >> SysUTM.xml
+echo "                                                                                                            " >> SysUTM.xml
+echo "         </BSC>                                                                                             " >> SysUTM.xml
+echo "</SystemeCoord>                                                                                             " >> SysUTM.xml 
+
+
+mkdir ImOrig
+find ./ -maxdepth 1 -regex ".*\(tif\)" | while read file;
+do
+    filename=$(basename -- "$file")
+	extension="${filename##*.}"
+	f="${filename%.*}"
+	echo "Found image : " $f
+	convert  $f.tif  -compress none $f\_NoComp.tif
+	mv $f.tif ImOrig/$f.tif
+	mv $f\_NoComp.tif $f.tif
+done  
+
+
+
+mm3d OriConvert "#F=N X Y Z" GNSS.txt RAWGNSS_N MTD1=1 NameCple=FileImagesNeighbour.xml DN=5000 OkNoIm=1 
+mm3d Tapioca File FileImagesNeighbour.xml 2000
+mm3d Schnaps .*tif
+mm3d Tapas RadialStd .*tif Out=Arbitrary SH=_mini FocFree=0
+mm3d AperiCloud .*tif Ori-Arbitrary SH=_mini
+mm3d CenterBascule .*tif Arbitrary RAWGNSS_N Ground_Init_UTM
+
+mm3d Campari .*tif Ground_Init_UTM Ground_UTM EmGPS=[RAWGNSS_N,0.5] AllFree=0 SH=_mini
+
+mm3d Malt Ortho .*tif Ground_UTM ResolTerrain=0.5 EZA=1 ZoomF=2 ResolOrtho=0.5 NbVI=2 DefCor=0.1
+mm3d Tawny Ortho-MEC-Malt RadiomEgal=0
+
+mkdir OUTPUT
+
+cd MEC-Malt
+finalDEMs=($(ls Z_Num*_DeZoom*_STD-MALT.tif))
+finalcors=($(ls Correl_STD-MALT_Num*.tif))
+DEMind=$((${#finalDEMs[@]}-1))
+corind=$((${#finalcors[@]}-1))
+lastDEM=${finalDEMs[DEMind]}
+lastcor=${finalcors[corind]}
+laststr="${lastDEM%.*}"
+corrstr="${lastcor%.*}"
+cp $laststr.tfw $corrstr.tfw
+cd ..
+
+gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
+gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
+
