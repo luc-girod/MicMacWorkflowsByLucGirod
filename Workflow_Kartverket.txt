@@ -34,7 +34,7 @@ mm3d Tapas RadialStd .*tif Out=Arbitrary SH=_mini FocFree=0
 mm3d AperiCloud .*tif Ori-Arbitrary SH=_mini
 mm3d CenterBascule .*tif Arbitrary RAWGNSS_N Ground_Init_UTM
 
-mm3d Campari .*tif Ground_Init_UTM Ground_UTM EmGPS=[RAWGNSS_N,0.5] AllFree=0 SH=_mini
+mm3d Campari .*tif Ground_Init_UTM Ground_UTM EmGPS=[RAWGNSS_N,0.5] AllFree=1 SH=_mini
 
 mm3d Malt Ortho .*tif Ground_UTM ResolTerrain=0.5 EZA=1 ZoomF=2 ResolOrtho=0.5 NbVI=2 DefCor=0.1
 mm3d Tawny Ortho-MEC-Malt RadiomEgal=0
