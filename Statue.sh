@@ -10,7 +10,7 @@
 EXTENSION=JPG
 use_Schnaps=true
 use_Circ=false
-wait_for_mask=false
+use_mask=false
 ZOOM=2
 
 while getopts "e:slcmz:h" opt; do
@@ -22,7 +22,7 @@ while getopts "e:slcmz:h" opt; do
       echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
       echo "	-l             : Use Tapioca Line (if images are taken in a line, def false -> Tapioca Mulscale)."
       echo "	-c             : Use Tapioca Line Circ=1 (if images are taken in a circle (if last image is linked with first), def false -> Tapioca Mulscale)."
-      echo "	-m             : Pause for Mask before correlation (does not by default)."
+      echo "	-m             : Use 3D Mask for correlation (does not by default, tries whole visible objects)."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
       echo " "
@@ -44,7 +44,7 @@ while getopts "e:slcmz:h" opt; do
       use_Line=true
       ;; 
 	m)
-      wait_for_mask=true
+      use_mask=true
       ;;  
     \?)
       echo "Statue.sh: Invalid option: -$OPTARG" >&1
@@ -93,14 +93,17 @@ mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH
 
 #HERE, MASKING COULD BE DONE!!!
-if [ "$wait_for_mask" = true ]; then
-	read -rsp $'Press any key to continue...\n' -n1 key
-fi
-	
-#Do the correlation of the images
-if [ "$use_Schnaps" = true ]; then
-	mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary__mini.ply
+if [ "$use_mask" = true ]; then
+	read -rsp $'Create a 3D mask on the Apericloud using (from another terminal): \n mm3d SaisieMasqQT AperiCloud_Arbitrary.ply \n Then press any key to continue...\n' -n1 key
+	#Do the correlation of the images
+	if [ "$use_Schnaps" = true ]; then
+		mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary__mini.ply SH=$SH
+	else
+		mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary.ply SH=$SH
+	fi
 else
-	mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM Masq3D=AperiCloud_Arbitrary.ply
+	#Do the correlation of the images with no mask
+	mm3d C3DC Statue .*$EXTENSION Ori-Arbitrary ZoomF=$ZOOM SH=$SH
 fi
+
 
