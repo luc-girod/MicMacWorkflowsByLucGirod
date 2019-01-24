@@ -16,7 +16,7 @@ ZOOM=2
 while getopts "e:sl:c:mz:h" opt; do
   case $opt in
     h)
-      echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
+      echo "Run the workflow for 3D acquisition going around a subject (statue, with -c option), or more random."
       echo "usage: Statue.sh -e JPG -m"
       echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
