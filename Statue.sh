@@ -13,15 +13,15 @@ use_Circ=false
 use_mask=false
 ZOOM=2
 
-while getopts "e:slcmz:h" opt; do
+while getopts "e:sl:c:mz:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
       echo "usage: Statue.sh -e JPG -m"
       echo "	-e EXTENSION   : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-s             : Do not use 'Schnaps' optimised homologous points (does by default)."
-      echo "	-l             : Use Tapioca Line (if images are taken in a line, def false -> Tapioca Mulscale)."
-      echo "	-c             : Use Tapioca Line Circ=1 (if images are taken in a circle (if last image is linked with first), def false -> Tapioca Mulscale)."
+      echo "	-l             : Use 'Tapioca Line N' (if images are taken in a line with N the number of image before and after considered in match,\n def false -> Tapioca Mulscale)."
+      echo "	-c             : Use 'Tapioca Line Circ=1 N '(if images are taken in a circle with N the number of image before and after considered in match,\n (if last image is linked with first), def false -> Tapioca Mulscale)."
       echo "	-m             : Use 3D Mask for correlation (does not by default, tries whole visible objects)."
       echo "	-z ZOOM        : Zoom Level (default=2)"
       echo "	-h	  : displays this message and exits."
@@ -39,9 +39,11 @@ while getopts "e:slcmz:h" opt; do
       ;; 
 	c)
       use_Circ=true
+	  circVal=$OPTARG
       ;; 
 	l)
       use_Line=true
+	  lineVal=$OPTARG
       ;; 
 	m)
       use_mask=true
