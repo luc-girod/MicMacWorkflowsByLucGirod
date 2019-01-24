@@ -73,13 +73,13 @@ DevAllPrep.sh
 
 #Find Tie points using multi-resolution
 if [ "$use_Circ" = true ]; then
-	echo "Using Tapioca Circ .* 2000 8 Circ=1"
-	mm3d Tapioca Line .*$EXTENSION 2000 8 Circ=1
+	echo "Using Tapioca Circ .*$EXTENSION 2000 $circVal Circ=1"
+	mm3d Tapioca Line .*$EXTENSION 2000 $circVal Circ=1
 elif [ "$use_Line" = true ]; then
-	echo "Using Tapioca Circ .* 2000 8"
-	mm3d Tapioca Line .*$EXTENSION 2000 8
+	echo "Using mm3d Tapioca Line .*$EXTENSION 2000 $lineVal"
+	mm3d Tapioca Line .*$EXTENSION 2000 $lineVal
 else
-	echo "Using Tapioca MulScale .* 500 2000"
+	echo "Using Tapioca MulScale .*$EXTENSION 500 2000"
 	mm3d Tapioca MulScale .*$EXTENSION 500 2000
 fi
 
