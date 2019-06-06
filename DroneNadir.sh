@@ -27,7 +27,7 @@ obliqueFolder=none
 regul=0
 CleanUp=0
 
-while getopts "e:x:y:u:spcao:r:z:th" opt; do
+while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
