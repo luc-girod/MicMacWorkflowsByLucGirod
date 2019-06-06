@@ -25,8 +25,9 @@ resol_set=false
 ZoomF=2
 obliqueFolder=none
 regul=0
+CleanUp=0
 
-while getopts "e:x:y:u:spcao:r:z:h" opt; do
+while getopts "e:x:y:u:spcao:r:z:th" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -42,6 +43,7 @@ while getopts "e:x:y:u:spcao:r:z:h" opt; do
       echo "	-o obliqueFolder : Folder with oblique imagery to help orientation (will be entierely copied then deleted during process)."
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
+      echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files"
       echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
@@ -80,6 +82,9 @@ while getopts "e:x:y:u:spcao:r:z:h" opt; do
       ;;	
 	z)
       ZoomF=$OPTARG
+      ;;	
+	t)
+      CleanUp=$OPTARG
       ;;
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -158,7 +163,7 @@ fi
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 
 #Print out a text file with the camera positions (for use in external software, e.g. GIS)
-mm3d OriExport Ori-Ground_UTM/.*xml CameraPositionsUTM.txt AddF=1
+mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1
 
 #Taking away files from the oblique folder
 if [ "$obliqueFolder" != none ]; then	
@@ -204,4 +209,10 @@ cd ..
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
+
+if [ "$CleanUp" = 1 ]; then
+	rm -r Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh
+elif [ "$CleanUp" = 2 ]; then
+	rm -r Tm* Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh Homol* Pastis
+fi
 
