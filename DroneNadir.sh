@@ -210,6 +210,7 @@ gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
 
+echo "Cleaning up with option "$CleanUp""
 if [ "$CleanUp" = 1 ]; then
 	rm -r Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh
 elif [ "$CleanUp" = 2 ]; then
