@@ -63,8 +63,8 @@ echo " Z_MAX      : "$Z_MAX
 
 # First filter by correlation score and height thresholds
 echo "gdal_calc.py  -A $DEM_IN -B $CORR --calc=\"(B>200)*(A>$Z_MIN)*(A<$Z_MAX)\" --outfile=\"$CORR_Name\"_Thresh.tif --NoDataValue=0 --type=Byte"
-gdal_calc.py -A "$DEM_IN" -B "$CORR" --calc="(B>180)" --outfile="$CORR_Name"_Thresh.tif --NoDataValue=0 --type=Byte
-#gdal_calc.py -A "$DEM_IN" -B "$CORR" --calc="((B>200)*(A>$Z_MIN)*(A<$Z_MAX))" --outfile="$CORR_Name"_Thresh.tif --NoDataValue=0 --type=Byte
+#gdal_calc.py -A "$DEM_IN" -B "$CORR" --calc="(B>180)" --outfile="$CORR_Name"_Thresh.tif --NoDataValue=0 --type=Byte
+gdal_calc.py -A "$DEM_IN" -B "$CORR" --calc="((B>200)*(A>$Z_MIN)*(A<$Z_MAX))" --outfile="$CORR_Name"_Thresh.tif --NoDataValue=0 --type=Byte
 
 echo "convert $CORR_Name""_Thresh.tif -morphology Open Octagon:15 $CORR_Name""_Open.tif"
 convert "$CORR_Name"_Thresh.tif -morphology Open Octagon:15 "$CORR_Name"_Open.tif
