@@ -132,37 +132,56 @@ if [ "$do_AperiCloud" = true ]; then
 fi
 
 #Get the GNSS data out of the images and convert it to a txt file (GpsCoordinatesFromExif.txt)
+echo "mm3d XifGps2Txt .*$EXTENSION"
 mm3d XifGps2Txt .*$EXTENSION
+
 #Get the GNSS data out of the images and convert it to a xml orientation folder (Ori-RAWGNSS), also create a good RTL (Local Radial Tangential) system.
+echo "mm3d XifGps2Xml .*$EXTENSION RAWGNSS"
 mm3d XifGps2Xml .*$EXTENSION RAWGNSS
+
 #Use the GpsCoordinatesFromExif.txt file to create a xml orientation folder (Ori-RAWGNSS_N), and a file (FileImagesNeighbour.xml) detailing what image sees what other image (if camera is <50m away with option DN=50)
+echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100"
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
+
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
+echo "mm3d Tapioca File FileImagesNeighbour.xml 2000"
 mm3d Tapioca File FileImagesNeighbour.xml 2000
+
 if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
-	mm3d Schnaps .*$EXTENSION MoveBadImgs=1
+    echo "mm3d Schnaps .*$EXTENSION MoveBadImgs=1"	
+    mm3d Schnaps .*$EXTENSION MoveBadImgs=1
 fi
+
 #Compute Relative orientation (Arbitrary system)
+echo "mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH"
 mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 
 #Visualize relative orientation, if apericloud is not working, run 
 if [ "$do_AperiCloud" = true ]; then
-	mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
+    echo "mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH "	
+    mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
 fi
 
 #Transform to  RTL system
+echo "mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL"
 mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
+
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
+echo "mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH"
 mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH
+
 #Visualize Ground_RTL orientation
 if [ "$do_AperiCloud" = true ]; then
-	mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
+    echo "mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH"	
+    mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
 fi
 #Change system to final cartographic system
+echo "mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM"
 mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
 
 #Print out a text file with the camera positions (for use in external software, e.g. GIS)
+echo "mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1"
 mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1
 
 #Taking away files from the oblique folder
@@ -179,18 +198,23 @@ fi
 
 #Correlation into DEM
 if [ "$resol_set" = true ]; then
-	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
+    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF"	
+    mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
 else
-	mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
+    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF"	
+    mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
 fi
 
 #Mosaic from individual orthos
+echo "mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul"
 mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul
+
 #Making OUTPUT folder
 mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 if [ "$do_ply" = true ]; then
-	mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]
+    echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]"	
+    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]
 fi
 
 
@@ -206,8 +230,11 @@ corrstr="${lastcor%.*}"
 cp $laststr.tfw $corrstr.tfw
 cd ..
 
+echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif"
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
+echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif"
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
+echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif"
 gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
 
 echo "Cleaning up with option "$CleanUp""
@@ -216,4 +243,3 @@ if [ "$CleanUp" = 1 ]; then
 elif [ "$CleanUp" = 2 ]; then
 	rm -r Tm* Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh Homol* Pastis
 fi
-
