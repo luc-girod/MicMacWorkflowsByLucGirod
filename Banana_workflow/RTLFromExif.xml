@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<SystemeCoord>
+     <BSC>
+          <TypeCoord>eTC_RTL</TypeCoord>
+          <AuxR>7.5449475738983276</AuxR>
+          <AuxR>60.5802228535319713</AuxR>
+          <AuxR>1414.44824931304902</AuxR>
+          <ByFile>false</ByFile>
+     </BSC>
+     <BSC>
+          <TypeCoord>eTC_WGS84</TypeCoord>
+          <ByFile>false</ByFile>
+          <AuxRUnite>eUniteAngleDegre</AuxRUnite>
+     </BSC>
+</SystemeCoord>
