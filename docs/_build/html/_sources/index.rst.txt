@@ -9,6 +9,10 @@ Welcome to MicMacWorkflows's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
+   
+   setup
+   tutorials/DroneNadir.sh
+   tutorials/DevAllPrep.sh
 
 
 

@@ -17,7 +17,7 @@
 EXTENSION=JPG
 X_OFF=0;
 Y_OFF=0;
-utm_set=false
+PROJ_set=false
 do_ply=true
 do_AperiCloud=true
 use_Schnaps=true
@@ -27,7 +27,7 @@ obliqueFolder=none
 regul=0
 CleanUp=0
 
-while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
+while getopts "e:x:y:u:v:spcao:r:z:t:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -36,6 +36,7 @@ while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
       echo "	-x X_OFF         : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF         : Y (northing) offset for ply file overflow issue (default=0)."
       echo "	-u UTMZONE       : UTM Zone of area of interest. Takes form 'NN +north(south)'"
+      echo "	-v PROJ          : PROJ.4 string for coordinate system of output (use if not UTM)"
       echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
       echo "	-p do_ply        : use to NOT export ply file."
       echo "	-c regul         : use to activate color equalization in mosaicking (only do with good camera, eg NOT DJI)."
@@ -43,7 +44,7 @@ while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
       echo "	-o obliqueFolder : Folder with oblique imagery to help orientation (will be entierely copied then deleted during process)."
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
-      echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files"
+      echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files)"
       echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
@@ -52,8 +53,12 @@ while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
       EXTENSION=$OPTARG
       ;;
 	u)
-      UTM=$OPTARG
-      utm_set=true
+      PROJ="+proj=UTM +zone="$OPTARG "+ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+      proj_set=true
+      ;; 
+	v)
+      PROJ=$OPTARG
+      proj_set=true
       ;;  
 	r)
       RESOL=$OPTARG
@@ -96,8 +101,8 @@ while getopts "e:x:y:u:spcao:r:z:t:h" opt; do
       ;;
   esac
 done
-if [ "$utm_set" = false ]; then
-	echo "UTM zone not set"
+if [ "$proj_set" = false ]; then
+	echo "Projection system not set"
 	exit 1
 fi
 if [ "$use_Schnaps" = true ]; then
@@ -107,18 +112,18 @@ else
 	echo "Not using Schnaps!"
 	SH=""
 fi
-#create UTM file (after deleting any existing one)
-rm SysUTM.xml
-echo "<SystemeCoord>                                                                                              " >> SysUTM.xml
-echo "         <BSC>                                                                                              " >> SysUTM.xml
-echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                                                             " >> SysUTM.xml
-echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
-echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
-echo "            <AuxR>       1        </AuxR>                                                                   " >> SysUTM.xml
-echo "            <AuxStr>  +proj=utm +zone="$UTM "+ellps=WGS84 +datum=WGS84 +units=m +no_defs   </AuxStr>        " >> SysUTM.xml
-echo "                                                                                                            " >> SysUTM.xml
-echo "         </BSC>                                                                                             " >> SysUTM.xml
-echo "</SystemeCoord>                                                                                             " >> SysUTM.xml
+#create PROJ file (after deleting any existing one)
+rm SysPROJ.xml
+echo "<SystemeCoord>                                                                                              " >> SysPROJ.xml
+echo "         <BSC>                                                                                              " >> SysPROJ.xml
+echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                                                             " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxStr>  "$PROJ"   </AuxStr>                                                                   " >> SysPROJ.xml
+echo "                                                                                                            " >> SysPROJ.xml
+echo "         </BSC>                                                                                             " >> SysPROJ.xml
+echo "</SystemeCoord>                                                                                             " >> SysPROJ.xml
 
 
 #Copy everything from the folder with oblique images
@@ -177,12 +182,12 @@ if [ "$do_AperiCloud" = true ]; then
     mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
 fi
 #Change system to final cartographic system
-echo "mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM"
-mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysUTM.xml Ground_UTM
+echo "mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysPROJ.xml Ground_PROJ"
+mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysPROJ.xml Ground_PROJ
 
 #Print out a text file with the camera positions (for use in external software, e.g. GIS)
-echo "mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1"
-mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1
+echo "mm3d OriExport Ori-Ground_PROJ/O.*xml CameraPositionsPROJ.txt AddF=1"
+mm3d OriExport Ori-Ground_PROJ/O.*xml CameraPositionsPROJ.txt AddF=1
 
 #Taking away files from the oblique folder
 if [ "$obliqueFolder" != none ]; then	
@@ -198,11 +203,11 @@ fi
 
 #Correlation into DEM
 if [ "$resol_set" = true ]; then
-    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF"	
-    mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
+    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_PROJ ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF"	
+    mm3d Malt Ortho ".*.$EXTENSION" Ground_PROJ ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF
 else
-    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF"	
-    mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM EZA=1 ZoomF=$ZoomF
+    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_PROJ EZA=1 ZoomF=$ZoomF"	
+    mm3d Malt Ortho ".*.$EXTENSION" Ground_PROJ EZA=1 ZoomF=$ZoomF
 fi
 
 #Mosaic from individual orthos
@@ -213,8 +218,8 @@ mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul
 mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 if [ "$do_ply" = true ]; then
-    echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]"	
-    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetUTM.ply Offs=[$X_OFF,$Y_OFF,0]
+    echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
+    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
 fi
 
 
@@ -230,12 +235,12 @@ corrstr="${lastcor%.*}"
 cp $laststr.tfw $corrstr.tfw
 cd ..
 
-echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif"
-gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
-echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif"
-gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" MEC-Malt/$lastcor OUTPUT/CORR.tif
-echo "gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif"
-gdal_translate -a_srs "+proj=utm +zone=$UTM +ellps=WGS84 +datum=WGS84 +units=m +no_defs" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
+echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif"
+gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
+echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/CORR.tif"
+gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/CORR.tif
+echo "gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif"
+gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
 
 echo "Cleaning up with option "$CleanUp""
 if [ "$CleanUp" = 1 ]; then
