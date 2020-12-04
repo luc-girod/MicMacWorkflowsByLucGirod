@@ -1,0 +1,311 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Installation and Setup &mdash; MicMacWorkflows 1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The DroneNadir workflow" href="tutorials/DroneNadir.sh.html" />
+    <link rel="prev" title="Welcome to MicMacWorkflows’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> MicMacWorkflows
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation and Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-the-scripts">Getting the scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installing-micmac">Installing MicMac</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-the-scripts-to-your-path">Adding the scripts to your path</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#optional-preparing-a-python-environment">Optional: Preparing a python environment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/DroneNadir.sh.html">The DroneNadir workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials/DevAllPrep.sh.html">The DevAllPrep script</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MicMacWorkflows</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Installation and Setup</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/setup.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="installation-and-setup">
+<h1>Installation and Setup<a class="headerlink" href="#installation-and-setup" title="Permalink to this headline">¶</a></h1>
+<p>The following is a (non-exhaustive) set of instructions for getting setup to run MicMac on your own machine. Note
+that MicMac can be an <strong>extremely</strong> computationally intensive process, so we don’t really recommend trying to run this on your
+personal laptop.</p>
+<p>As this is a (non-exhaustive) set of instructions, it may not work 100% with your particular setup.
+We are happy to try to provide guidance/support, <strong>but we make no promises</strong>.</p>
+<div class="section" id="getting-the-scripts">
+<h2>Getting the scripts<a class="headerlink" href="#getting-the-scripts" title="Permalink to this headline">¶</a></h2>
+<p>To get those scripts, you can download the current version from <a class="reference external" href="https://github.com/luc-girod/MicMacWorkflowsByLucGirod">https://github.com/luc-girod/MicMacWorkflowsByLucGirod</a>
+or clone with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">luc</span><span class="o">-</span><span class="n">girod</span><span class="o">/</span><span class="n">MicMacWorkflowsByLucGirod</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-micmac">
+<h2>Installing MicMac<a class="headerlink" href="#installing-micmac" title="Permalink to this headline">¶</a></h2>
+<p>Detailed installation instructions for MicMac on multiple platforms can be found <a class="reference external" href="https://micmac.ensg.eu/index.php/Install/">here</a>,
+but we’ve added a short summary to help guide through the process.</p>
+<p>First, clone the MicMac repository to a folder on your computer (you can also do this online via github):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/bob/software:~$ git clone https://github.com/micmacIGN/micmac.git
+...
+/home/bob/software:~$ cd micmac
+/home/bob/software/micmac:~$ git fetch
+/home/bob/software/micmac:~$ git checkout IncludeALGLIB
+</pre></div>
+</div>
+<p>This will clone the MicMac git repository to your machine, fetch the remote, and switch to the <em>IncludeALGLIB</em> branch.
+Check the <strong>README.md</strong> (or <strong>LISEZMOI.md</strong>) file to install any dependencies, then:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/bob/software/micmac:~$ mkdir build &amp;&amp; cd build/
+/home/bob/software/micmac/build:~$ cmake .. -DWITH_QT5=1 -DWERROR=0 -DWITH_CCACHE=OFF
+...
+/home/bob/software/micmac/build:~$ make install -j$n
+</pre></div>
+</div>
+<p>where $n is the number of cores to compile MicMac with. The compiler flag <strong>-DWERROR=0</strong> is needed, as some of the dependencies
+will throw warnings that will force the compiler to quit with errors if we don’t turn it off.</p>
+<p>Finally, make sure to add the MicMac bin directory (/home/bob/software/micmac/bin in the above example) to your $PATH
+environment variable, in order to be able to run MicMac. You can check that all dependencies are installed by running
+the following:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/bob:~$ mm3d CheckDependencies
+git revision : v1.0.beta13-844-g21d990533
+
+byte order   : little-endian
+address size : 64 bits
+
+micmac directory : [/home/bob/software/micmac/]
+auxilary tools directory : [/home/bob/software/micmac/binaire-aux/linux/]
+
+--- Qt enabled : 5.9.5
+    library path:  [/home/bob/miniconda3/envs/bobtools/plugins]
+
+make:  found (/usr/bin/make)
+exiftool:  found (/usr/bin/exiftool)
+exiv2:  found (/usr/bin/exiv2)
+convert:  found (/usr/bin/convert)
+proj:  found (/usr/bin/proj)
+cs2cs:  found (/usr/bin/cs2cs
+</pre></div>
+</div>
+<p>You should also see the following output from the <strong>mm3d SateLib ApplyParallaxCor</strong> command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>/home/bob:~$ mm3d SateLib ApplyParallaxCor
+*****************************
+*  Help for Elise Arg main  *
+*****************************
+Mandatory unnamed args :
+  * string :: {Image to be corrected}
+  * string :: {Paralax correction file}
+Named args :
+  * [Name=Out] string :: {Name of output image (Def=ImName_corrected.tif)}
+  * [Name=FitASTER] INT :: {Fit functions appropriate for ASTER L1A processing (input &#39;1&#39; or &#39;2&#39; : version number)}
+  * [Name=ExportFitASTER] bool :: {Export grid from FitASTER (Def=false)}
+  * [Name=ASTERSceneName] string :: {ASTER L1A Scene name (Only for and MANDATORY for FitASTERv2)}
+</pre></div>
+</div>
+<p>In a nutshell, the basic idea is: clone the MicMac git repository, then build the source code. Simple!</p>
+</div>
+<div class="section" id="adding-the-scripts-to-your-path">
+<h2>Adding the scripts to your path<a class="headerlink" href="#adding-the-scripts-to-your-path" title="Permalink to this headline">¶</a></h2>
+<p>The folder where the scripts are downloaded on your machine (or where you cloned the depository) neds to be added to your path so the scripts can be called from anywhere. This is system dependent, and Google will be your fiend, just search “adding a folder to path on XXXXX” where XXXXX is your OS.</p>
+</div>
+<div class="section" id="optional-preparing-a-python-environment">
+<h2>Optional: Preparing a python environment<a class="headerlink" href="#optional-preparing-a-python-environment" title="Permalink to this headline">¶</a></h2>
+<p>If you like, you can set up a dedicated python environment for your MicMac needs as some scripts rely on Python. This can be handy, in case any
+packages required by these scripts clash with packages in your default environment. Our personal preference is <a class="reference external" href="https://docs.conda.io/en/latest/">conda</a>,
+but your preferences may differ.</p>
+<p>The git repository has a file, micmac_env.yml, which provides a working environment for pymmaster and conda.
+Once you have conda installed, simply run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span><span class="o">-</span><span class="n">env</span> <span class="n">create</span> <span class="o">-</span><span class="n">f</span> <span class="n">micmac_env</span><span class="o">.</span><span class="n">yml</span>
+</pre></div>
+</div>
+<p>This will create a new conda environment, called micmac_env, which will have all of the various python packages
+necessary to run pymmaster. To activate the new environment, type:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">activate</span> <span class="n">micmac_env</span>
+</pre></div>
+</div>
+<p>And you should be ready to go.</p>
+<p>If you don’t manage to go through this tutorial, feel free to ask for help by sending an e-mail, though it can also be helpful to google around
+for some solutions first. If you do send us an e-mail, be sure to include the specific error messages that you receive.
+Screenshots are also helpful.</p>
+<p>Good luck!</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tutorials/DroneNadir.sh.html" class="btn btn-neutral float-right" title="The DroneNadir workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to MicMacWorkflows’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2020, Luc Girod
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

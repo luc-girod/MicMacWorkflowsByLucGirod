@@ -6,6 +6,8 @@ This repository is a work in progress as I try to provide the most automated and
 
 The MicMac wiki can also help you : http://micmac.ensg.eu
 
+The community is on Reddit : https://www.reddit.com/r/MicMac/
+
 The forum is always open : http://forum-micmac.forumprod.com/
 
 Please contact luc.girod@gmail.com if you have any issues.
