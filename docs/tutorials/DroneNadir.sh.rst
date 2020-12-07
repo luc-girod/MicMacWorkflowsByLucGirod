@@ -10,8 +10,6 @@ First, I would like to remind users that an along-track overlap of 80% and acros
 
 Secondly, the only input requiered for this workflow is images that include a geolocation tag in their EXIF metadata.
 
-The current version of the script only supports UTM zones as output coordinate system. It can easily adapted to run any EPSG code.
-
 Running the script
 ###################
 
