@@ -37,7 +37,7 @@ More details for some select options:
 
 * :code:`-x` and :code:`-y` define an offset so the exported 32bits ply files do not have an overflow issue and round the points' coordinates. Without them, the point cloud would appear with lines of points at regular intervals much higher than the expected pitch. The exact values here don't matter very much, but "somewhere in the survey domain" is the recommendation. The coordinates need to be given in the same system as the export system (defined next with -u).
 * :code:`-u` defined the UTM zone of the final products. The format is "NN +hemisphere", so, for UTM32N (EPSG:32632), the expected value is :code:`"32 +north"`, and for UTM5S (EPSG:32705) :code:`"5 +south"`.
-* :code:`-v` offers an option to use any projection system that PROJ.4 can use. You then have to put a full proj string, for instance for UTM32N : :code:`"+proj=UTM +zone=32 +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs"`
+* :code:`-v` offers an option to use any projection system that PROJ.4 can use. You then have to put a full proj string, for instance for UTM32N : :code:`"+proj=utm +zone=32 +north +ellps=WGS84 +datum=WGS84 +units=m +no_defs"`
 * :code:`-s` Schnaps is a tie point optimiser that reduces the amount of tie points while optimising their distributions in the images. It also removes images that do not have enough tie points. It is **switch on** by default.
 * :code:`-p` By default, the workflow exports a point cloud of the final DEM. You can suppress that functionnality with this option.
 * :code:`-c` By default, the mosaicking of the individually orthorectified images is done without any colour balancing and equalization. This is because MicMac is pretty bad at this and often produces rather poor results.
