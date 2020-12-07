@@ -53,7 +53,7 @@ while getopts "e:x:y:u:v:spcao:r:z:t:h" opt; do
       EXTENSION=$OPTARG
       ;;
 	u)
-      PROJ="+proj=UTM +zone=$OPTARG +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+      PROJ="+proj=utm +zone=$OPTARG +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
       proj_set=true
       ;; 
 	v)
