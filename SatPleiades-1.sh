@@ -186,7 +186,7 @@ fi
 if [ "$gresol_set" = true ]; then
 	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj ResolTerrain=$GRESOL EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1
 else
-	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1
+	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1
 fi
 
 #Merge orthophotos to create Orthomosaic
