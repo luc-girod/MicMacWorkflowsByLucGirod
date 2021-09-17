@@ -27,7 +27,7 @@ obliqueFolder=none
 regul=0
 CleanUp=0
 
-while getopts "e:x:y:u:v:spcao:r:z:t:h" opt; do
+while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -45,6 +45,7 @@ while getopts "e:x:y:u:v:spcao:r:z:t:h" opt; do
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
       echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files)"
+      echo "	-n	             : name of scene (used as prefix in the output)."
       echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
@@ -90,6 +91,9 @@ while getopts "e:x:y:u:v:spcao:r:z:t:h" opt; do
       ;;	
 	t)
       CleanUp=$OPTARG
+      ;;	
+	n)
+      NamePrefix=$OPTARG
       ;;
     \?)
       echo "DroneNadir.sh: Invalid option: -$OPTARG" >&1
@@ -170,7 +174,7 @@ fi
 
 #Transform to  RTL system
 echo "mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL"
-mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
+mm3d CenterBascule .*$EXTENSION ArbitraryAll RAWGNSS_N Ground_Init_RTL
 
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
 echo "mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH"
@@ -235,12 +239,12 @@ corrstr="${lastcor%.*}"
 cp $laststr.tfw $corrstr.tfw
 cd ..
 
-echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif"
-gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/DEM_geotif.tif
-echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/CORR.tif"
-gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/CORR.tif
-echo "gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif"
-gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/OrthoImage_geotif.tif
+echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/"$NamePrefix".DEM_geotif.tif"
+gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/$NamePrefix.DEM_geotif.tif
+echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/"$NamePrefix".CORR.tif"
+gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/$NamePrefix.CORR.tif
+echo "gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/"$NamePrefix".OrthoImage_geotif.tif"
+gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/$NamePrefix.OrthoImage_geotif.tif
 
 echo "Cleaning up with option "$CleanUp""
 if [ "$CleanUp" = 1 ]; then
