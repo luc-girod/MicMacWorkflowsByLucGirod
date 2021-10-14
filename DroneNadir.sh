@@ -26,6 +26,7 @@ ZoomF=2
 obliqueFolder=none
 regul=0
 CleanUp=0
+NamePrefix=DroneNadir
 
 while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
   case $opt in
@@ -45,7 +46,7 @@ while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
       echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files)"
-      echo "	-n	             : name of scene (used as prefix in the output)."
+      echo "	-n	             : name of scene (used as prefix in the output, default=DroneNadir)."
       echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
