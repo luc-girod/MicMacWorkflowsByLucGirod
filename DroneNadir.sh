@@ -224,7 +224,7 @@ mkdir OUTPUT
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 if [ "$do_ply" = true ]; then
     echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
-    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
+    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/$NamePrefix.PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
 fi
 
 
