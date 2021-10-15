@@ -154,8 +154,11 @@ echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=De
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
 
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
+#Find half size of image:
+firstIm=$(ls *.$EXTENSION | head -n1)
+halfsize=$(expr $(exiftool -s3  -ImageWidth $firstIm) / 2)
 echo "mm3d Tapioca File FileImagesNeighbour.xml 2000"
-mm3d Tapioca File FileImagesNeighbour.xml 2000
+mm3d Tapioca File FileImagesNeighbour.xml $halfsize
 
 if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
@@ -175,7 +178,7 @@ fi
 
 #Transform to  RTL system
 echo "mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL"
-mm3d CenterBascule .*$EXTENSION ArbitraryAll RAWGNSS_N Ground_Init_RTL
+mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
 echo "mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH"
