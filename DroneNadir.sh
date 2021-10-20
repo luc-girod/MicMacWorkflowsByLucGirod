@@ -27,8 +27,9 @@ obliqueFolder=none
 regul=0
 CleanUp=0
 NamePrefix=DroneNadir
+GNSS_Q=5
 
-while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
+while getopts "e:x:y:u:v:g:spcao:r:z:t:n:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -38,6 +39,7 @@ while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
       echo "	-y Y_OFF         : Y (northing) offset for ply file overflow issue (default=0)."
       echo "	-u UTMZONE       : UTM Zone of area of interest. Takes form 'NN +north(south)'"
       echo "	-v PROJ          : PROJ.4 string for coordinate system of output (use if not UTM)"
+      echo "	-g GNSS_Q        : Quality of embedded GNSS (in m, Def=5m, right for non-phase GNSS data)"
       echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
       echo "	-p do_ply        : use to NOT export ply file."
       echo "	-c regul         : use to activate color equalization in mosaicking (only do with good camera, eg NOT DJI)."
@@ -45,8 +47,8 @@ while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
       echo "	-o obliqueFolder : Folder with oblique imagery to help orientation (will be entierely copied then deleted during process)."
       echo "	-r RESOL         : Ground resolution (in meters)"
       echo "	-z ZoomF         : Last step in pyramidal dense correlation (default=2, can be in [8,4,2,1])"
-      echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=allows for further processing 2=keep only final files)"
-      echo "	-n	             : name of scene (used as prefix in the output, default=DroneNadir)."
+      echo "	-t Clean-up      : Remove most temporary files after the process is over (Option 0(default)=no 1=keep Correlation and ortho folders, 2=allows for further processing 3=keep only final files)"
+      echo "	-n NamePrefix    : name of scene (used as prefix in the output, default=DroneNadir)."
       echo "	-h	             : displays this message and exits."
       echo " "
       exit 0
@@ -61,6 +63,9 @@ while getopts "e:x:y:u:v:spcao:r:z:t:n:h" opt; do
 	v)
       PROJ=$OPTARG
       proj_set=true
+      ;; 
+	g)
+      GNSS_Q=$OPTARG
       ;;  
 	r)
       RESOL=$OPTARG
@@ -182,7 +187,7 @@ mm3d CenterBascule .*$EXTENSION Arbitrary RAWGNSS_N Ground_Init_RTL
 
 #Bundle adjust using both camera positions and tie points (number in EmGPS option is the quality estimate of the GNSS data in meters)
 echo "mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH"
-mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,5] AllFree=1 SH=$SH
+mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,$GNSS_Q] AllFree=1 SH=$SH
 
 #Visualize Ground_RTL orientation
 if [ "$do_AperiCloud" = true ]; then
@@ -252,7 +257,9 @@ gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/$NamePr
 
 echo "Cleaning up with option "$CleanUp""
 if [ "$CleanUp" = 1 ]; then
-	rm -r Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh
+	rm -r Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh
 elif [ "$CleanUp" = 2 ]; then
+	rm -r Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh
+elif [ "$CleanUp" = 3 ]; then
 	rm -r Tm* Ori-InterneScan Ori-Arbitrary Ori-Ground_Init_RTL Ori-RAWGNSS Ori-RAWGNSS_N MEC-Malt Ortho-MEC-Malt Pyram SauvApero.xml Schnaps_poubelle.txt WarnApero.txt MkDevlop DevAll.sh Homol* Pastis
 fi
