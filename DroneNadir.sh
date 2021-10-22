@@ -146,6 +146,10 @@ if [ "$do_AperiCloud" = true ]; then
 	DevAllPrep.sh
 fi
 
+#Making OUTPUT folder
+mkdir OUTPUT
+
+
 #Get the GNSS data out of the images and convert it to a txt file (GpsCoordinatesFromExif.txt)
 echo "mm3d XifGps2Txt .*$EXTENSION"
 mm3d XifGps2Txt .*$EXTENSION
@@ -178,7 +182,7 @@ mm3d Tapas FraserBasic .*$EXTENSION Out=Arbitrary SH=$SH
 #Visualize relative orientation, if apericloud is not working, run 
 if [ "$do_AperiCloud" = true ]; then
     echo "mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH "	
-    mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH 
+    mm3d AperiCloud .*$EXTENSION Ori-Arbitrary SH=$SH Out=OUTPUT/$NamePrefix.AperiCloud_Arbitrary.ply
 fi
 
 #Transform to  RTL system
@@ -192,7 +196,7 @@ mm3d Campari .*$EXTENSION Ground_Init_RTL Ground_RTL EmGPS=[RAWGNSS_N,$GNSS_Q] A
 #Visualize Ground_RTL orientation
 if [ "$do_AperiCloud" = true ]; then
     echo "mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH"	
-    mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH
+    mm3d AperiCloud .*$EXTENSION Ori-Ground_RTL SH=$SH Out=OUTPUT/$NamePrefix.AperiCloud_Ground_RTL.ply
 fi
 #Change system to final cartographic system
 echo "mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysPROJ.xml Ground_PROJ"
@@ -227,8 +231,7 @@ fi
 echo "mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul"
 mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul
 
-#Making OUTPUT folder
-mkdir OUTPUT
+
 #PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 if [ "$do_ply" = true ]; then
     echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
@@ -248,11 +251,11 @@ corrstr="${lastcor%.*}"
 cp $laststr.tfw $corrstr.tfw
 cd ..
 
-echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/"$NamePrefix".DEM_geotif.tif"
+echo "gdal_translate -a_srs \""$PROJ\"" MEC-Malt/$lastDEM OUTPUT/"$NamePrefix".DEM_geotif.tif"
 gdal_translate -a_srs "$PROJ" MEC-Malt/$lastDEM OUTPUT/$NamePrefix.DEM_geotif.tif
-echo "gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/"$NamePrefix".CORR.tif"
+echo "gdal_translate -a_srs \""$PROJ\"" MEC-Malt/$lastcor OUTPUT/"$NamePrefix".CORR.tif"
 gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/$NamePrefix.CORR.tif
-echo "gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/"$NamePrefix".OrthoImage_geotif.tif"
+echo "gdal_translate -a_srs \""$PROJ\"" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/"$NamePrefix".OrthoImage_geotif.tif"
 gdal_translate -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/$NamePrefix.OrthoImage_geotif.tif
 
 echo "Cleaning up with option "$CleanUp""
