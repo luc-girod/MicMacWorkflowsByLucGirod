@@ -28,8 +28,9 @@ regul=0
 CleanUp=0
 NamePrefix=DroneNadir
 GNSS_Q=5
+DN=100
 
-while getopts "e:x:y:u:v:g:spcao:r:z:t:n:h" opt; do
+while getopts "e:x:y:u:v:g:sd:pcao:r:z:t:n:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
@@ -41,6 +42,7 @@ while getopts "e:x:y:u:v:g:spcao:r:z:t:n:h" opt; do
       echo "	-v PROJ          : PROJ.4 string for coordinate system of output (use if not UTM)"
       echo "	-g GNSS_Q        : Quality of embedded GNSS (in m, Def=5m, right for non-phase GNSS data)"
       echo "	-s SH            : Do not use 'Schnaps' optimised homologous points."
+      echo "	-d DN            : Max distance between camera for tie point search (default=100, in m)."
       echo "	-p do_ply        : use to NOT export ply file."
       echo "	-c regul         : use to activate color equalization in mosaicking (only do with good camera, eg NOT DJI)."
       echo "	-a do_AperiCloud : use to NOT export AperiCloud file."
@@ -73,6 +75,9 @@ while getopts "e:x:y:u:v:g:spcao:r:z:t:n:h" opt; do
       ;; 
 	s)
       use_Schnaps=false
+      ;;  
+	d)
+      DN=$OPTARG
       ;;   	
     p)
       do_ply=false
@@ -159,8 +164,8 @@ echo "mm3d XifGps2Xml .*$EXTENSION RAWGNSS"
 mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 
 #Use the GpsCoordinatesFromExif.txt file to create a xml orientation folder (Ori-RAWGNSS_N), and a file (FileImagesNeighbour.xml) detailing what image sees what other image (if camera is <50m away with option DN=50)
-echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100"
-mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
+echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN"
+mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN
 
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 #Find half size of image:
