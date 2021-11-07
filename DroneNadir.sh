@@ -171,7 +171,7 @@ mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWG
 #Find half size of image:
 firstIm=$(ls *.$EXTENSION | head -n1)
 halfsize=$(expr $(exiftool -s3  -ImageWidth $firstIm) / 2)
-echo "mm3d Tapioca File FileImagesNeighbour.xml 2000"
+echo "mm3d Tapioca File FileImagesNeighbour.xml "$halfsize
 mm3d Tapioca File FileImagesNeighbour.xml $halfsize
 
 if [ "$use_Schnaps" = true ]; then
