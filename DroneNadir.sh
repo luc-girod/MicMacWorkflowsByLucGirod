@@ -246,6 +246,7 @@ fi
 
 cd MEC-Malt
 	lastDEM=($(find . -regex '.*Z_Num[0-9]*_DeZoom[0-9]*_STD-MALT.tif' | sort -r))
+	lastNuageImProf=($(find . -regex '.*NuageImProf.*[0-9].xml' | sort -r))
 	lastmsk=($(find . -regex '.*AutoMask_STD-MALT_Num_[0-9]*\.tif' | sort -r))
 	lastcor=($(find . -regex '.*Correl_STD-MALT_Num_[0-9]*\.tif' | sort -r))
 	lastDEMstr="${lastDEM%.*}"
@@ -261,6 +262,11 @@ cd MEC-Malt
 	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/"$NamePrefix".DEM_geotif.tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
 	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/$NamePrefix.DEM_geotif.tif --calc="B*(A>0)" --NoDataValue=-9999
 	rm tmp_geo.tif tmp_msk.tif
+	#PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
+	if [ "$do_ply" = true ]; then
+		echo "mm3d Nuage2Ply MEC-Malt/"$lastNuageImProf" Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
+		mm3d Nuage2Ply $lastNuageImProf Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/$NamePrefix.PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
+	fi
 cd ..
 
 echo "gdal_translate  -a_nodata 0 -a_srs \""$PROJ\"" MEC-Malt/$lastcor OUTPUT/"$NamePrefix".CORR.tif"
