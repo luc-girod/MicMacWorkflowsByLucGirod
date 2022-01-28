@@ -141,11 +141,11 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 
 #Use the GpsCoordinatesFromExif.txt file to create a xml orientation folder (Ori-RAWGNSS_N), and a file (FileImagesNeighbour.xml) detailing what image sees what other image (if camera is <50m away with option DN=50)
 echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100"
-mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=100
+mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1
 
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
-echo "mm3d Tapioca File FileImagesNeighbour.xml 2000"
-mm3d Tapioca File FileImagesNeighbour.xml 2000
+echo "mm3d Tapioca MulScale .*JPG 500 2000"
+mm3d Tapioca MulScale .*JPG 500 2000
 
 if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
@@ -186,5 +186,5 @@ mm3d OriExport Ori-Ground_UTM/O.*xml CameraPositionsUTM.txt AddF=1
 
 
 #Correlation into 3D cloud
-    echo "mm3d Malt Ortho ".*.$EXTENSION" Ground_UTM ResolTerrain=$RESOL EZA=1 ZoomF=$ZoomF"	
+    echo " mm3d C3DC BigMac ".*.$EXTENSION" Ground_UTM OffsetPly=[$X_OFF,$Y_OFF,0]"	
     mm3d C3DC BigMac ".*.$EXTENSION" Ground_UTM OffsetPly=[$X_OFF,$Y_OFF,0]
