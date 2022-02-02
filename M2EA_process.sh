@@ -158,10 +158,8 @@ mkdir OUTPUT
 echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN"
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN
 
-#Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
-#Find half size of image:
-firstIm=$(ls *.$EXTENSION | head -n1) halfsize=$(expr $(exiftool -s3 -ImageWidth $firstIm) / 2) echo "mm3d Tapioca File FileImagesNeighbour.xml "$halfsize mm3d 
-Tapioca File FileImagesNeighbour.xml -1
+#Find Tie points using full resolution image (best value for Thermal or other low resolution sensor)
+mm3d Tapioca File FileImagesNeighbour.xml -1
 
 if [ "$use_Schnaps" = true ]; then
 	#filter TiePoints (better distribution, avoid clogging)
@@ -250,8 +248,8 @@ cd MEC-Malt
 	rm tmp_geo.tif tmp_msk.tif
 	#PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
 	if [ "$do_ply" = true ]; then
-		echo "mm3d Nuage2Ply MEC-Malt/"$lastNuageImProf" Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
-		mm3d Nuage2Ply $lastNuageImProf Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/$NamePrefix.PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
+		echo "mm3d Nuage2Ply "$lastNuageImProf" Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
+		mm3d Nuage2Ply $lastNuageImProf Attr=../Ortho-MEC-Malt/Orthophotomosaic.tif Out=../OUTPUT/$NamePrefix.PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
 	fi
 cd ..
 
