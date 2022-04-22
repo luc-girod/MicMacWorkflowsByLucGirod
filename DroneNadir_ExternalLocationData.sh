@@ -244,7 +244,7 @@ if [ "$do_AperiCloud" = true ]; then
 fi
 #Change system to final cartographic system
 echo "mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysPROJ.xml Ground_PROJ"
-mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTLFromExif.xml@SysPROJ.xml Ground_PROJ
+mm3d ChgSysCo  .*$EXTENSION Ground_RTL RTL.xml@SysPROJ.xml Ground_PROJ
 
 #Print out a text file with the camera positions (for use in external software, e.g. GIS)
 echo "mm3d OriExport Ori-Ground_PROJ/O.*xml CameraPositionsPROJ.txt AddF=1"
@@ -274,13 +274,6 @@ fi
 #Mosaic from individual orthos
 echo "mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul"
 mm3d Tawny Ortho-MEC-Malt RadiomEgal=$regul
-
-
-#PointCloud from Ortho+DEM, with offset substracted to the coordinates to solve the 32bit precision issue
-if [ "$do_ply" = true ]; then
-    echo "mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]"	
-    mm3d Nuage2Ply MEC-Malt/NuageImProf_STD-MALT_Etape_8.xml Attr=Ortho-MEC-Malt/Orthophotomosaic.tif Out=OUTPUT/$NamePrefix.PointCloud_OffsetPROJ.ply Offs=[$X_OFF,$Y_OFF,0]
-fi
 
 
 cd MEC-Malt
