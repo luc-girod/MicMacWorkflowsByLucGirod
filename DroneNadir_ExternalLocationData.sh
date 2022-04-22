@@ -152,7 +152,7 @@ echo "</SystemeCoord>                                                           
 
 #create @RTL.xml file (after deleting any existing one)
 #First we need to find the mean lat/long to put in there, using the GNSS_FILE. We consider that NAME LON LAT are the first 3 columns in the csv
-IFS=','
+IFS=' '
 LON_MID=0
 LAT_MID=0
 nbIm=0
