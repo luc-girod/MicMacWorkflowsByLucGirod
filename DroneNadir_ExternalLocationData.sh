@@ -34,7 +34,7 @@ while getopts "e:x:y:u:v:g:f:sd:pcao:r:z:t:n:h" opt; do
   case $opt in
     h)
       echo "Run the workflow for drone acquisition at nadir (and pseudo nadir) angles)."
-      echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -p true -r 0.05"
+      echo "usage: DroneNadir.sh -e JPG -x 55000 -y 6600000 -u \"32 +north\" -f GNSS_FILE.csv"
       echo "	-e EXTENSION     : image file type (JPG, jpg, TIF, png..., default=JPG)."
       echo "	-x X_OFF         : X (easting) offset for ply file overflow issue (default=0)."
       echo "	-y Y_OFF         : Y (northing) offset for ply file overflow issue (default=0)."
@@ -203,8 +203,8 @@ fi
 mkdir OUTPUT
 
 #Use the GpsCoordinatesFromExif.txt file to create a xml orientation folder (Ori-RAWGNSS_N), and a file (FileImagesNeighbour.xml) detailing what image sees what other image (if camera is <50m away with option DN=50)
-echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN"
-mm3d OriConvert "#F=N X Y Z" $GNSS_FILE RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1
+echo "mm3d OriConvert \"#F=N X Y Z O P K Ix Iz\""$GNSS_FILE"RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1"
+mm3d OriConvert "#F=N X Y Z O P K Ix Iz" $GNSS_FILE RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1
 
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 #Find half size of image:
