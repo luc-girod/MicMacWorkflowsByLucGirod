@@ -203,8 +203,8 @@ fi
 mkdir OUTPUT
 
 #Use the GpsCoordinatesFromExif.txt file to create a xml orientation folder (Ori-RAWGNSS_N), and a file (FileImagesNeighbour.xml) detailing what image sees what other image (if camera is <50m away with option DN=50)
-echo "mm3d OriConvert \"#F=N X Y Z O P K Ix Iz\""$GNSS_FILE"RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1"
-mm3d OriConvert "#F=N X Y Z O P K Ix Iz" $GNSS_FILE RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1
+echo "mm3d OriConvert \"#F=N X Y Z W P K Ix Iz\""$GNSS_FILE"RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1"
+mm3d OriConvert "#F=N X Y Z W P K Ix Iz" $GNSS_FILE RAWGNSS_N ChSys=DegreeWGS84@RTL.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1
 
 #Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
 #Find half size of image:
