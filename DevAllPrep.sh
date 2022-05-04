@@ -20,7 +20,11 @@ for file in $(find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\
 do
 	imNb=$(expr $imNb + 1) 
     f=$(basename "$file")
+	echo "echo \"\"">> DevAll.sh
+	echo "echo \"******************************************************\"" >> DevAll.sh
 	echo "echo \"Image \""$imNb"/"$nbIm" : " $f>> DevAll.sh
+	echo "echo \"******************************************************\"" >> DevAll.sh
+	echo "echo \"\"">> DevAll.sh
 	echo "mm3d Devlop \"./$f\" 8B=1 Gray=1 NameOut=./Tmp-MM-Dir/"$f"_Ch1.tif" >> DevAll.sh
 	echo "mm3d Devlop \"./$f\" 8B=1 Gray=0 NameOut=./Tmp-MM-Dir/"$f"_Ch3.tif" >> DevAll.sh
 done  
