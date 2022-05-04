@@ -5,7 +5,7 @@
 nbIm=0
 mkdir Tmp-MM-Dir
 rm DevAll.sh
-find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\|RW2\|IIQ\)" | while read file;
+for file in $(find ./ -maxdepth 1 -regex ".*\(JPG\|jpg\|png\|PNG\|ARW\|NEF\|CR2\|RW2\|IIQ\)");
 do
 	nbIm=$(expr $nbIm + 1) 
     f=$(basename "$file")
