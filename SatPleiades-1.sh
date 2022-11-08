@@ -209,15 +209,15 @@ fi
 #Correlation into DEM
 if [ "$DEMInit" != "None" ]; then
     if [ "$gresol_set" = true ]; then
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
     else
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
     fi
 else
     if [ "$gresol_set" = true ]; then
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
     else
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho
     fi
 fi
 
