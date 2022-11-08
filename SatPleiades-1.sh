@@ -125,19 +125,20 @@ selection=
 until [  "$selection" = "1" ]; do
     echo "
     CHECK (carefully) PARAMETERS
-	- Image file extension : $EXTIM
-	- RPC file extension : $EXTRPC
-	- Prefix of image file name : $PREFIM
-	- Prefix of RPC file name : $PREFRPC
-	- Degree of polynomial : $DEG
-	- CRS transformation file : $CHSYSXML
-	- Subsampling resolution for Tapioca : $RESSIZE
-	- Use Schnaps for filtering tie points : $use_Schnaps
-	- Pause for mask images or create mask for chantier : $wait_for_mask
-	- ZoomF : $ZOOM
-	- Ground resolution for output : $GRESOL
-	- Orthophotomosaic type: $orthob
-	- EPSG code : $EPSG
+	- Image file extension        : $EXTIM
+	- RPC file extension          : $EXTRPC
+	- Prefix of image file name   : $PREFIM
+	- Prefix of RPC file name     : $PREFRPC
+	- Degree of polynomial        : $DEG
+	- CRS transformation file     : $CHSYSXML
+	- Tapioca resolution          : $RESSIZE
+	- Use Schnaps                 : $use_Schnaps
+	- Pause for mask              : $wait_for_mask
+	- ZoomF                       : $ZOOM
+	- Output GSD                  : $GRESOL
+	- Orthophotomosaic type       : $orthob
+	- EPSG code                   : $EPSG
+	- Ininialization DEM          : $DEMInit
 "
     echo "
     CHOOSE BETWEEN
@@ -152,14 +153,12 @@ until [  "$selection" = "1" ]; do
     case $selection in
         1 ) echo "Let's process now" ; continue ;;
         0 ) exit ;;
-	2 ) echo "
-		For help use : ./SatPleiades.sh -h
-	   " >&1
-	   exit 1 ;;
+	    2 ) echo "
+		For help use : ./SatPleiades.sh -h \n" >&1
+	    exit 1 ;;
         * ) echo "
 		Only 0 or 1 are valid choices
-		For help use : ./SatPleiades.sh -h
-		" >&1
+		For help use : ./SatPleiades.sh -h \n" >&1
 		exit 1 ;;
     esac
 done
