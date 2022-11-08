@@ -51,7 +51,7 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:h" opt; do
       echo "	-m 		      : Pause for Mask before correlation (default=$wait_for_mask)"
       echo "	-z ZOOM       : Zoom Level (default=$ZOOM)"
       echo "	-g GRESOL     : Output Ground resolution (in meters)(if not set, will be defined automatically)"
-      echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 3 - Use _P for geometry and _MS for Ortho (default=$orthob)"
+      echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 2 - Use _P for geometry and _MS for Ortho (default=$orthob)"
       echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG) "
       echo "	-i DEMInit    : Name of initialization DEM (without suffix, must have a MicMac style XML descriptor as well)"
       echo "	-h	 	      : displays this message and exits."
@@ -203,6 +203,7 @@ fi
 
 #HERE, MASKING COULD BE DONE!!!
 if [ "$wait_for_mask" = true ]; then
+    mm3d Tarama $ImMNT $MaltOri
 	read -rsp $'Do the masking and Press any key to continue...\n' -n1 key
 fi
 
