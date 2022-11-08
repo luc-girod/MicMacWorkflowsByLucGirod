@@ -20,8 +20,9 @@ wait_for_mask=false
 ZOOM=2 # Final zoom
 gresol_set=false # ground resolution set
 RESSIZE=10000 # RESOLUTION OF SUBSAMPLED IMAGE FOR TAPIOCA, FOR FULL IMAGE USE -1
-orthob=false #boolean for creation of orthophotomosaic
+orthob=0 #boolean for creation of orthophotomosaic
 EPSG=32632 # Coordinate system EPSG code, !!!!!!!! be coherent with the WGS84toUTM.xml file !!!!!!
+ResolOrtho=1
 
 echo "
 	********************************************
@@ -32,7 +33,7 @@ echo "
 	"
 
 #input arguments
-while getopts "e:f:p:q:d:c:r:smz:g:oa:h" opt; do
+while getopts "e:f:p:q:d:c:r:smz:g:o:a:h" opt; do
   case $opt in
     h)
       echo " "
@@ -45,10 +46,10 @@ while getopts "e:f:p:q:d:c:r:smz:g:oa:h" opt; do
       echo "	-c CHSYSXML	  : File containing the transform CRS from wgs84 to utm (default=$CHSYSXML)"
       echo "	-r RESSIZE	  : Resolution of the subsampled image for tapioca, (default=$RESSIZE, for full image use -1)"
       echo "	-s 	          : Use 'Schnaps' optimized homologous points (default=$use_Schnaps)"
-      echo "	-m 		  : Pause for Mask before correlation (default=$wait_for_mask)"
-      echo "	-z ZOOM           : Zoom Level (default=$ZOOM)"
-      echo "	-g GRESOL         : Output Ground resolution (in meters)(if not set, will be defined automatically)"
-      echo "	-o		  : Create Orthophotomosaic alose (default=$orthob)"
+      echo "	-m 		      : Pause for Mask before correlation (default=$wait_for_mask)"
+      echo "	-z ZOOM       : Zoom Level (default=$ZOOM)"
+      echo "	-g GRESOL     : Output Ground resolution (in meters)(if not set, will be defined automatically)"
+      echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 3 - Use _P for geometry and _MS for Ortho (default=$orthob)"
       echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG) "
       echo "	-h	 	  : displays this message and exits."
       echo " "
@@ -92,7 +93,16 @@ while getopts "e:f:p:q:d:c:r:smz:g:oa:h" opt; do
       GRESOL=$OPTARG
       ;;
 	o)
-      orthob=true
+      orthob=$OPTARG
+      if [ "$orthob" = 1 ]; then
+        ImOrtho="$PREFIM(.*).$EXTIM"
+        ImMNT="$PREFIM(.*).$EXTIM"
+        ResolOrtho=1
+      else
+        ImOrtho="$PREFIM(.*_MS.*).$EXTIM"
+        ImMNT="$PREFIM(.*_P.*).$EXTIM"
+        ResolOrtho=0.5
+      fi
       ;;
     \?)
       echo "Script : Invalid option: -$OPTARG" >&1
@@ -121,7 +131,7 @@ until [  "$selection" = "1" ]; do
 	- Pause for mask images or create mask for chantier : $wait_for_mask
 	- ZoomF : $ZOOM
 	- Ground resolution for output : $GRESOL
-	- Create an orthophotomosaic : $orthob
+	- Orthophotomosaic type: $orthob
 	- EPSG code : $EPSG
 "
     echo "
@@ -184,13 +194,13 @@ fi
 
 #Correlation into DEM
 if [ "$gresol_set" = true ]; then
-	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj ResolTerrain=$GRESOL EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1
+	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj ResolTerrain=$GRESOL EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
 else
-	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1
+	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
 fi
 
 #Merge orthophotos to create Orthomosaic
-if [ "$orthob"=true ]; then
+if [ "$orthob" != 0 ]; then
         mm3d Tawny Ortho-MEC-Malt
 fi
 
@@ -202,32 +212,28 @@ echo "
 	"
 
 mkdir OUTPUT
+
 cd MEC-Malt
-#get the last file names
-finalDEMs=($(ls Z_Num*_DeZoom*_STD-MALT.tif))
-finalcors=($(ls Correl_STD-MALT_Num*.tif))
-finalautomask=($(ls AutoMask_STD-MALT_Num*.tif))
-DEMind=$((${#finalDEMs[@]}-1))
-corind=$((${#finalcors[@]}-1))
-autoind=$((${#finalautomas[@]}-1))
-lastDEM=${finalDEMs[DEMind]}
-lastcor=${finalcors[corind]}
-lastautomask=${finalautomask[autoind]}
-laststr="${lastDEM%.*}"
-corrstr="${lastcor%.*}"
-automstr="${lastautomask%.*}"
-echo "DEM : lastDEM=$lastDEM; laststr=$laststr"
-echo "CORRELATION : lastcor=$lastcor; corrstr=$corrstr"
-echo "AUTOMASK : lastautomask=$lastautomask; automstr=$automstr"
-#copy tfw
-cp $laststr.tfw $corrstr.tfw
-cp $laststr.tfw $automstr.tfw
+	lastDEM=($(find . -regex '.*Z_Num[0-9]*_DeZoom[0-9]*_STD-MALT.tif' | sort -r))
+	lastNuageImProf=($(find . -regex '.*NuageImProf.*[0-9].xml' | sort -r))
+	lastmsk=($(find . -regex '.*AutoMask_STD-MALT_Num_[0-9]*\.tif' | sort -r))
+	lastcor=($(find . -regex '.*Correl_STD-MALT_Num_[0-9]*\.tif' | sort -r))
+	lastDEMstr="${lastDEM%.*}"
+	lastcorstr="${lastcor%.*}"
+	lastmskstr="${lastmsk%.*}"
+	cp $lastDEMstr.tfw $lastcorstr.tfw
+	cp $lastDEMstr.tfw $lastmskstr.tfw
+	# Converting MicMac output DEM to files with masked areas as nodata
+	echo "gdal_translate -a_srs EPSG:"$EPSG" $lastDEM tmp_geo.tif"
+	gdal_translate -a_srs EPSG:$EPSG $lastDEM tmp_geo.tif
+	echo "gdal_translate -a_srs EPSG:"$EPSG" -a_nodata 0 $lastmsk tmp_msk.tif"
+	gdal_translate -a_srs EPSG:$EPSG -a_nodata 0 $lastmsk tmp_msk.tif
+	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/DEM_MICMAC_"$EPSG".tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
+	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/DEM_MICMAC_$EPSG.tif --calc="B*(A>0)" --NoDataValue=-9999
+	rm tmp_geo.tif tmp_msk.tif
 cd ..
 
-#export DEM, CORR and AUTOMASK with gdal
-gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastDEM OUTPUT/DEM_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastcor OUTPUT/CORR_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
-gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastautomask OUTPUT/AUTOMASK_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 
 # export Ortho
 if [ "$orthob"=true ]; then
@@ -241,12 +247,6 @@ if [ "$orthob"=true ]; then
 		gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 	fi
 fi
-
-# Set no correlation zones to NODATA using AUTOMASK
-cd OUTPUT
-gdal_calc.py -A DEM_MICMAC_$EPSG.tif -B AUTOMASK_MICMAC_$EPSG.tif --calc=A*B --NoDataValue=0 --outfile=DEM_MICMAC_$EPSG-cleaned.tif
-gdal_translate DEM_MICMAC_$EPSG-cleaned.tif DEM_MICMAC_$EPSG-clean.tif -co COMPRESS=DEFLATE
-rm DEM_MICMAC_$EPSG-cleaned.tif
 
 #Hillshading
 #gdaldem hillshade DEM_MICMAC_$EPSG-clean.tif SHD_DEM_MICMAC_$EPSG-clean.tif -co COMPRESS=DEFLATE
