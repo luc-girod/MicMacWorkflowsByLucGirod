@@ -179,17 +179,21 @@ fi
 #convert RPC info from nominal to MicMac format
 #(specify the degree of your polynomial + working coordinate system)
 mm3d Convert2GenBundle "$PREFIM(.*).$EXTIM" "$PREFRPC\$1.$EXTRPC" RPC-d$DEG Degre=$DEG ChSys=$CHSYSXML
+MaltOri=RPC-d$DEG
 
-#Find Tie points using all images
-mm3d Tapioca All "$PREFIM(.*).$EXTIM" $RESSIZE
+if [ "$DEG" != 0 ]; then
+    #Find Tie points using all images
+    mm3d Tapioca All "$PREFIM(.*).$EXTIM" $RESSIZE
 
-if [ "$use_Schnaps" = true ]; then
-	#filter TiePoints (better distribution, avoid clogging)
-	mm3d Schnaps .*$EXTIM MoveBadImgs=1
+    if [ "$use_Schnaps" = true ]; then
+        #filter TiePoints (better distribution, avoid clogging)
+        mm3d Schnaps .*$EXTIM MoveBadImgs=1
+    fi
+
+    #Bundle adjustment, compensation
+    mm3d Campari "$PREFIM(.*).$EXTIM" RPC-d$DEG RPC-d$DEG-adj SH=$SH
+    MaltOri=RPC-d$DEG-adj
 fi
-
-#Bundle adjustment, compensation
-mm3d Campari "$PREFIM(.*).$EXTIM" RPC-d$DEG RPC-d$DEG-adj SH=$SH
 
 #HERE, MASKING COULD BE DONE!!!
 if [ "$wait_for_mask" = true ]; then
@@ -199,15 +203,15 @@ fi
 #Correlation into DEM
 if [ "$DEMInit" != "None" ]; then
     if [ "$gresol_set" = true ]; then
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
     else
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
     fi
 else
     if [ "$gresol_set" = true ]; then
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
     else
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
     fi
 fi
 
