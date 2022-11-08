@@ -23,6 +23,7 @@ RESSIZE=10000 # RESOLUTION OF SUBSAMPLED IMAGE FOR TAPIOCA, FOR FULL IMAGE USE -
 orthob=0 #boolean for creation of orthophotomosaic
 EPSG=32632 # Coordinate system EPSG code, !!!!!!!! be coherent with the WGS84toUTM.xml file !!!!!!
 ResolOrtho=1
+DEMInit="None"
 
 echo "
 	********************************************
@@ -33,13 +34,13 @@ echo "
 	"
 
 #input arguments
-while getopts "e:f:p:q:d:c:r:smz:g:o:a:h" opt; do
+while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:h" opt; do
   case $opt in
     h)
       echo " "
       echo "Usage: $0 -e TIF -f XML -p IMG -q RPC -d 0 -c WGS84toUTM.xml -r 10000 -s -m -z 2 -g 1 -o -a 32632"
       echo "	-e EXTIM   	  : image file extension (JPG, jpg, TIF, tif, png..., default=$EXTIM)."
-      echo "	-f EXTRPC         : RPC file extension (XML, xml, ..., default=$EXTRPC)."
+      echo "	-f EXTRPC     : RPC file extension (XML, xml, ..., default=$EXTRPC)."
       echo "	-p PREFIM	  : Prefix for image name (default=$PREFIM)"
       echo "	-q PREFRPC	  : Prefix for RPC name (default=$PREFRPC)"
       echo "	-d DEG		  : Degree of the polynomial (default=$DEG)"
@@ -51,7 +52,8 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:h" opt; do
       echo "	-g GRESOL     : Output Ground resolution (in meters)(if not set, will be defined automatically)"
       echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 3 - Use _P for geometry and _MS for Ortho (default=$orthob)"
       echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG) "
-      echo "	-h	 	  : displays this message and exits."
+      echo "	-i DEMInit    : Name of initialization DEM (without suffix, must have a MicMac style XML descriptor as well)"
+      echo "	-h	 	      : displays this message and exits."
       echo " "
       exit 0
       ;;
@@ -91,6 +93,9 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:h" opt; do
 	g)
       gresol_set=true
       GRESOL=$OPTARG
+      ;;
+	i)
+      DEMInit=$OPTARG
       ;;
 	o)
       orthob=$OPTARG
@@ -193,10 +198,18 @@ if [ "$wait_for_mask" = true ]; then
 fi
 
 #Correlation into DEM
-if [ "$gresol_set" = true ]; then
-	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj ResolTerrain=$GRESOL EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
+if [ "$DEMInit" != "None" ]; then
+    if [ "$gresol_set" = true ]; then
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
+    else
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
+    fi
 else
-	mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
+    if [ "$gresol_set" = true ]; then
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
+    else
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" RPC-d$DEG-adj EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$orthob ResolOrtho=$ResolOrtho
+    fi
 fi
 
 #Merge orthophotos to create Orthomosaic
