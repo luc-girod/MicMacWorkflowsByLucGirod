@@ -23,6 +23,7 @@ RESSIZE=10000 # RESOLUTION OF SUBSAMPLED IMAGE FOR TAPIOCA, FOR FULL IMAGE USE -
 orthob=0 #boolean for creation of orthophotomosaic
 EPSG=32632 # Coordinate system EPSG code, !!!!!!!! be coherent with the WGS84toUTM.xml file !!!!!!
 ResolOrtho=1
+DoOrtho=0
 DEMInit="None"
 
 echo "
@@ -103,10 +104,12 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:h" opt; do
         ImOrtho="$PREFIM(.*).$EXTIM"
         ImMNT="$PREFIM(.*).$EXTIM"
         ResolOrtho=1
-      else
+        DoOrtho=1
+      elif [ "$orthob" = 2 ]; then
         ImOrtho="$PREFIM(.*_MS.*).$EXTIM"
         ImMNT="$PREFIM(.*_P.*).$EXTIM"
         ResolOrtho=0.5
+        DoOrtho=1
       fi
       ;;
     \?)
@@ -172,7 +175,10 @@ else
 	echo "Not using Schnaps!"
 	SH=""
 fi
-
+if [ "$orthob" = 0 ]; then
+ImOrtho="$PREFIM(.*).$EXTIM"
+ImMNT="$PREFIM(.*).$EXTIM"
+fi
 #Check WGS84toUTM.xml exist
 # TO BE DONE
 
