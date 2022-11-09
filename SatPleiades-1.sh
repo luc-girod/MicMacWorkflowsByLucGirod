@@ -110,7 +110,7 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
       elif [ "$orthob" = 2 ]; then
         ImOrtho="$PREFIM(.*_MS.*).$EXTIM"
         ImMNT="$PREFIM(.*_P.*).$EXTIM"
-        ResolOrtho=0.5
+        ResolOrtho=0.25
         DoOrtho=1
       fi
       ;;
