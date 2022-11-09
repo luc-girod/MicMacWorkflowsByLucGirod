@@ -25,6 +25,7 @@ EPSG=32632 # Coordinate system EPSG code, !!!!!!!! be coherent with the WGS84toU
 ResolOrtho=1
 DoOrtho=0
 DEMInit="None"
+NamePrefix="SatPleiades"
 
 echo "
 	********************************************
@@ -35,7 +36,7 @@ echo "
 	"
 
 #input arguments
-while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:h" opt; do
+while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
   case $opt in
     h)
       echo " "
@@ -52,8 +53,9 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:h" opt; do
       echo "	-z ZOOM       : Zoom Level (default=$ZOOM)"
       echo "	-g GRESOL     : Output Ground resolution (in meters)(if not set, will be defined automatically)"
       echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 2 - Use _P for geometry and _MS for Ortho (default=$orthob)"
-      echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG) "
+      echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG)"
       echo "	-i DEMInit    : Name of initialization DEM (without suffix, must have a MicMac style XML descriptor as well)"
+      echo "	-n NamePrefix : Prefix name for output (default=SatPleiades)"
       echo "	-h	 	      : displays this message and exits."
       echo " "
       exit 0
@@ -142,6 +144,7 @@ until [  "$selection" = "1" ]; do
 	- Orthophotomosaic type       : $orthob
 	- EPSG code                   : $EPSG
 	- Ininialization DEM          : $DEMInit
+	- Prefix name for output      : $NamePrefix
 "
     echo "
     CHOOSE BETWEEN
@@ -225,7 +228,7 @@ else
 fi
 
 #Merge orthophotos to create Orthomosaic
-if [ "$orthob" != 0 ]; then
+if [ $DoOrtho -eq 1 ]; then
         mm3d Tawny Ortho-MEC-Malt RadiomEgal=0
 fi
 
@@ -253,22 +256,22 @@ cd MEC-Malt
 	gdal_translate -a_srs EPSG:$EPSG $lastDEM tmp_geo.tif
 	echo "gdal_translate -a_srs EPSG:"$EPSG" -a_nodata 0 $lastmsk tmp_msk.tif"
 	gdal_translate -a_srs EPSG:$EPSG -a_nodata 0 $lastmsk tmp_msk.tif
-	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/DEM_MICMAC_"$EPSG".tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
-	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/DEM_MICMAC_$EPSG.tif --calc="B*(A>0)" --NoDataValue=-9999
+	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/"${NamePrefix}"_DEM_MICMAC_"$EPSG".tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
+	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/${NamePrefix}_DEM_MICMAC_$EPSG.tif --calc="B*(A>0)" --NoDataValue=-9999
 	rm tmp_geo.tif tmp_msk.tif
 cd ..
 
-gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastcor OUTPUT/CORR_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
+gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastcor OUTPUT/${NamePrefix}_CORR_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 
 # export Ortho
-if [ "$orthob"=true ]; then
+if [ $DoOrtho -eq 1 ]; then
 	if [ -f "./Ortho-MEC-Malt/Orthophotomosaic_Tile_0_0.tif" ]
 	then
         cd Ortho-MEC-Malt
 		mosaic_micmac_tiles.py -filename Orthophotomosaic
         cd ..
 	fi
-	gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
+	gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 fi
 
 #Hillshading
