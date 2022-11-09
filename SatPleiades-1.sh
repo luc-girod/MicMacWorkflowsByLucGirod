@@ -210,9 +210,9 @@ fi
 #Correlation into DEM
 if [ "$DEMInit" != "None" ]; then
     if [ "$gresol_set" = true ]; then
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ResolTerrain=$GRESOL
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ZoomI=8 ResolTerrain=$GRESOL
     else
-        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml
+        mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho DEMInitIMG=$DEMInit.tif DEMInitXML=$DEMInit.xml ZoomI=8
     fi
 else
     if [ "$gresol_set" = true ]; then
@@ -224,7 +224,7 @@ fi
 
 #Merge orthophotos to create Orthomosaic
 if [ "$orthob" != 0 ]; then
-        mm3d Tawny Ortho-MEC-Malt
+        mm3d Tawny Ortho-MEC-Malt RadiomEgal=1
 fi
 
 #Post Processing ######################################
@@ -262,13 +262,11 @@ gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastcor OUTPUT/CORR_MICMAC_$EPSG.tif 
 if [ "$orthob"=true ]; then
 	if [ -f "./Ortho-MEC-Malt/Orthophotomosaic_Tile_0_0.tif" ]
 	then
-		echo "
-		Cannot export Orthomosaic as tiles must be merged first
-		Use for example otbcli_TileFusion
-		"
-	else
-		gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
+        cd Ortho-MEC-Malt
+		mosaic_micmac_tiles.py -filename Orthophotomosaic
+        cd ..
 	fi
+	gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
 fi
 
 #Hillshading
