@@ -100,6 +100,9 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
 	i)
       DEMInit=$OPTARG
       ;;
+	n)
+      NamePrefix=$OPTARG
+      ;;
 	o)
       orthob=$OPTARG
       if [ "$orthob" = 1 ]; then
