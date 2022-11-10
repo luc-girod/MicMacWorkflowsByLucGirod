@@ -7,12 +7,11 @@ for file in $(find .. -name "RPC*");
 do
 	cp $file $(basename "$file")
 	echo "Found RPC file : " $(basename "$file")
-done  
-for file in $(find .. -name ".*TIF");
+done
+
+for file in $(find .. -name "*.TIF");
 do
-    $f=$(basename "$file")
-    $f=
-	cp $file $f
+	cp $file $(basename "$file")
 	echo "Found Image file : " $(basename "$file")
 done  
 rename _R1C1 "" *_R1C1.TIF
