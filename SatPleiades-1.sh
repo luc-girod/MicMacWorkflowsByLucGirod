@@ -12,7 +12,7 @@ EXTRPC=XML # RPC file extension
 PREFIM=IMG # Prefix for image name
 PREFRPC=RPC # Prefix for RPC name
 DEG=0 # Degree of the polynomial
-CHSYSXML=WGS84toUTM.xml #File containing the change transform coordinate sys from wgs84 to utm
+PROJ_set=false
 # necessary to check in this file that the UTM zone is OK
 use_Schnaps=false
 SH=  #postfix for homologous points in case of schnaps use
@@ -36,7 +36,7 @@ echo "
 	"
 
 #input arguments
-while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
+while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bh" opt; do
   case $opt in
     h)
       echo " "
@@ -46,16 +46,17 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
       echo "	-p PREFIM	  : Prefix for image name (default=$PREFIM)"
       echo "	-q PREFRPC	  : Prefix for RPC name (default=$PREFRPC)"
       echo "	-d DEG		  : Degree of the polynomial (default=$DEG)"
-      echo "	-c CHSYSXML	  : File containing the transform CRS from wgs84 to utm (default=$CHSYSXML)"
+      echo "	-u UTMZONE    : UTM Zone of area of interest. Takes form 'NN +north(south)'"
+      echo "	-v PROJ       : PROJ.4 string for coordinate system of output (use if not UTM)"
       echo "	-r RESSIZE	  : Resolution of the subsampled image for tapioca, (default=$RESSIZE, for full image use -1)"
       echo "	-s 	          : Use 'Schnaps' optimized homologous points (default=$use_Schnaps)"
       echo "	-m 		      : Pause for Mask before correlation (default=$wait_for_mask)"
       echo "	-z ZOOM       : Zoom Level (default=$ZOOM)"
       echo "	-g GRESOL     : Output Ground resolution (in meters)(if not set, will be defined automatically)"
       echo "	-o		      : 0 - no Ortho, 1 - Ortho using all provided images, 2 - Use _P for geometry and _MS for Ortho (default=$orthob)"
-      echo "	-a EPSG	  	  : Coordinate system EPSG code (default=$EPSG)"
       echo "	-i DEMInit    : Name of initialization DEM (without suffix, must have a MicMac style XML descriptor as well)"
       echo "	-n NamePrefix : Prefix name for output (default=SatPleiades)"
+      echo "	-b BringData  : Run GatherAirbusImages.sh to get data in folder (default=false)"
       echo "	-h	 	      : displays this message and exits."
       echo " "
       exit 0
@@ -90,8 +91,13 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
 	z)
       ZOOM=$OPTARG
       ;;
-	a)
-      EPSG=$OPTARG
+	u)
+      PROJ="+proj=utm +zone=$OPTARG +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
+      proj_set=true
+      ;; 
+	v)
+      PROJ=$OPTARG
+      proj_set=true
       ;;
 	g)
       gresol_set=true
@@ -117,6 +123,10 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
         DoOrtho=1
       fi
       ;;
+	b)
+      # Run the script
+      GatherAirbusImages.sh
+      ;;
     \?)
       echo "Script : Invalid option: -$OPTARG" >&1
       exit 1
@@ -129,6 +139,10 @@ while getopts "e:f:p:q:d:c:r:smz:g:o:a:i:n:h" opt; do
 done
 
 #check arguments and choose to continue or not
+if [ "$proj_set" = false ]; then
+	echo "Projection system not set (use option -u or -v, -h more more info)"
+	exit 1
+fi
 selection=
 until [  "$selection" = "1" ]; do
     echo "
@@ -138,14 +152,13 @@ until [  "$selection" = "1" ]; do
 	- Prefix of image file name   : $PREFIM
 	- Prefix of RPC file name     : $PREFRPC
 	- Degree of polynomial        : $DEG
-	- CRS transformation file     : $CHSYSXML
+	- Target projection system    : $PROJ
 	- Tapioca resolution          : $RESSIZE
 	- Use Schnaps                 : $use_Schnaps
 	- Pause for mask              : $wait_for_mask
 	- ZoomF                       : $ZOOM
 	- Output GSD                  : $GRESOL
 	- Orthophotomosaic type       : $orthob
-	- EPSG code                   : $EPSG
 	- Ininialization DEM          : $DEMInit
 	- Prefix name for output      : $NamePrefix
 "
@@ -174,6 +187,7 @@ done
 
 # MICMAC PROCESSING #################################
 
+
 if [ "$use_Schnaps" = true ]; then
 	echo "Using Schnaps!"
 	SH="_mini"
@@ -185,12 +199,25 @@ if [ "$orthob" = 0 ]; then
 ImOrtho="$PREFIM(.*).$EXTIM"
 ImMNT="$PREFIM(.*).$EXTIM"
 fi
-#Check WGS84toUTM.xml exist
-# TO BE DONE
+
+#Create SysPROJ.xml
+rm SysPROJ.xml
+echo "<SystemeCoord>                                                                                              " >> SysPROJ.xml
+echo "         <BSC>                                                                                              " >> SysPROJ.xml
+echo "            <TypeCoord>  eTC_Proj4 </TypeCoord>                                                             " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxR>       1        </AuxR>                                                                   " >> SysPROJ.xml
+echo "            <AuxStr>  "$PROJ"   </AuxStr>                                                                   " >> SysPROJ.xml
+echo "                                                                                                            " >> SysPROJ.xml
+echo "         </BSC>                                                                                             " >> SysPROJ.xml
+echo "</SystemeCoord>                                                                                             " >> SysPROJ.xml
+
+
 
 #convert RPC info from nominal to MicMac format
 #(specify the degree of your polynomial + working coordinate system)
-mm3d Convert2GenBundle "$PREFIM(.*).$EXTIM" "$PREFRPC\$1.$EXTRPC" RPC-d$DEG Degre=$DEG ChSys=$CHSYSXML
+mm3d Convert2GenBundle "$PREFIM(.*).$EXTIM" "$PREFRPC\$1.$EXTRPC" RPC-d$DEG Degre=$DEG ChSys=SysPROJ.xml
 MaltOri=RPC-d$DEG
 
 if [ "$DEG" != 0 ]; then
@@ -257,16 +284,16 @@ cd MEC-Malt
 	cp $lastDEMstr.tfw $lastcorstr.tfw
 	cp $lastDEMstr.tfw $lastmskstr.tfw
 	# Converting MicMac output DEM to files with masked areas as nodata
-	echo "gdal_translate -a_srs EPSG:"$EPSG" $lastDEM tmp_geo.tif"
-	gdal_translate -a_srs EPSG:$EPSG $lastDEM tmp_geo.tif
-	echo "gdal_translate -a_srs EPSG:"$EPSG" -a_nodata 0 $lastmsk tmp_msk.tif"
-	gdal_translate -a_srs EPSG:$EPSG -a_nodata 0 $lastmsk tmp_msk.tif
-	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/"${NamePrefix}"_DEM_MICMAC_"$EPSG".tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
-	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/${NamePrefix}_DEM_MICMAC_$EPSG.tif --calc="B*(A>0)" --NoDataValue=-9999
+	echo "gdal_translate -a_srs "$PROJ" $lastDEM tmp_geo.tif"
+	gdal_translate -a_srs $PROJ $lastDEM tmp_geo.tif
+	echo "gdal_translate -a_srs "$PROJ" -a_nodata 0 $lastmsk tmp_msk.tif"
+	gdal_translate -a_srs $PROJ -a_nodata 0 $lastmsk tmp_msk.tif
+	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/"${NamePrefix}"_DEM_MICMAC.tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
+	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/${NamePrefix}_DEM_MICMAC.tif --calc="B*(A>0)" --NoDataValue=-9999
 	rm tmp_geo.tif tmp_msk.tif
 cd ..
 
-gdal_translate -a_srs EPSG:$EPSG MEC-Malt/$lastcor OUTPUT/${NamePrefix}_CORR_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
+gdal_translate -a_srs $PROJ MEC-Malt/$lastcor OUTPUT/${NamePrefix}_CORR_MICMAC.tif -co COMPRESS=DEFLATE
 
 # export Ortho
 if [ $DoOrtho -eq 1 ]; then
@@ -276,7 +303,7 @@ if [ $DoOrtho -eq 1 ]; then
 		mosaic_micmac_tiles.py -filename Orthophotomosaic
         cd ..
 	fi
-	gdal_translate -a_nodata 0 -a_srs EPSG:$EPSG Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC_$EPSG.tif -co COMPRESS=DEFLATE
+	gdal_translate -a_nodata 0 -a_srs $PROJ Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC.tif -co COMPRESS=DEFLATE
 fi
 
 #Hillshading
