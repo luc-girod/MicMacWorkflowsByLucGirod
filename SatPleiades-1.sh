@@ -285,15 +285,15 @@ cd MEC-Malt
 	cp $lastDEMstr.tfw $lastmskstr.tfw
 	# Converting MicMac output DEM to files with masked areas as nodata
 	echo "gdal_translate -a_srs "$PROJ" $lastDEM tmp_geo.tif"
-	gdal_translate -a_srs $PROJ $lastDEM tmp_geo.tif
+	gdal_translate -a_srs "$PROJ" $lastDEM tmp_geo.tif
 	echo "gdal_translate -a_srs "$PROJ" -a_nodata 0 $lastmsk tmp_msk.tif"
-	gdal_translate -a_srs $PROJ -a_nodata 0 $lastmsk tmp_msk.tif
+	gdal_translate -a_srs "$PROJ" -a_nodata 0 $lastmsk tmp_msk.tif
 	echo "gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/"${NamePrefix}"_DEM_MICMAC.tif --calc=\"B*(A>0)\" --NoDataValue=-9999"
 	gdal_calc.py -A tmp_msk.tif -B tmp_geo.tif --outfile=../OUTPUT/${NamePrefix}_DEM_MICMAC.tif --calc="B*(A>0)" --NoDataValue=-9999
 	rm tmp_geo.tif tmp_msk.tif
 cd ..
 
-gdal_translate -a_srs $PROJ MEC-Malt/$lastcor OUTPUT/${NamePrefix}_CORR_MICMAC.tif -co COMPRESS=DEFLATE
+gdal_translate -a_srs "$PROJ" MEC-Malt/$lastcor OUTPUT/${NamePrefix}_CORR_MICMAC.tif -co COMPRESS=DEFLATE
 
 # export Ortho
 if [ $DoOrtho -eq 1 ]; then
@@ -303,7 +303,7 @@ if [ $DoOrtho -eq 1 ]; then
 		mosaic_micmac_tiles.py -filename Orthophotomosaic
         cd ..
 	fi
-	gdal_translate -a_nodata 0 -a_srs $PROJ Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC.tif -co COMPRESS=DEFLATE
+	gdal_translate -a_nodata 0 -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC.tif -co COMPRESS=DEFLATE
 fi
 
 #Hillshading
