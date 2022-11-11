@@ -26,6 +26,7 @@ ResolOrtho=1
 DoOrtho=0
 DEMInit="None"
 NamePrefix="SatPleiades"
+SkipValid=false
 
 echo "
 	********************************************
@@ -57,6 +58,7 @@ while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bh" opt; do
       echo "	-i DEMInit    : Name of initialization DEM (without suffix, must have a MicMac style XML descriptor as well)"
       echo "	-n NamePrefix : Prefix name for output (default=SatPleiades)"
       echo "	-b BringData  : Run GatherAirbusImages.sh to get data in folder (default=false)"
+      echo "	-k SkipValid  : Skip the validation of parameters, JUST DO IT (default=false)"
       echo "	-h	 	      : displays this message and exits."
       echo " "
       exit 0
@@ -127,6 +129,9 @@ while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bh" opt; do
       # Run the script
       GatherAirbusImages.sh
       ;;
+	k)
+      SkipValid=true
+      ;;
     \?)
       echo "Script : Invalid option: -$OPTARG" >&1
       exit 1
@@ -144,7 +149,7 @@ if [ "$proj_set" = false ]; then
 	exit 1
 fi
 selection=
-until [  "$selection" = "1" ]; do
+until [  "$selection" = "1" -o "$SkipValid" = true ]; do
     echo "
     CHECK (carefully) PARAMETERS
 	- Image file extension        : $EXTIM
