@@ -37,7 +37,7 @@ echo "
 	"
 
 #input arguments
-while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bh" opt; do
+while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bkh" opt; do
   case $opt in
     h)
       echo " "
