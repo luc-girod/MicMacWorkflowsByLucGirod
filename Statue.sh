@@ -71,16 +71,19 @@ fi
 DevAllPrep.sh
 
 
-#Find Tie points using multi-resolution
+#Find Tie points
+firstIm=$(ls *.$EXTENSION | head -n1)
+halfsize=$(expr $(exiftool -s3  -ImageWidth $firstIm) / 2)
+
 if [ "$use_Circ" = true ]; then
-	echo "Using Tapioca Circ .*$EXTENSION 2000 $circVal Circ=1"
-	mm3d Tapioca Line .*$EXTENSION 2000 $circVal Circ=1
+	echo "Using Tapioca Circ .*$EXTENSION "$halfsize" $circVal Circ=1"
+	mm3d Tapioca Line .*$EXTENSION $halfsize $circVal Circ=1
 elif [ "$use_Line" = true ]; then
-	echo "Using mm3d Tapioca Line .*$EXTENSION 2000 $lineVal"
-	mm3d Tapioca Line .*$EXTENSION 2000 $lineVal
+	echo "Using mm3d Tapioca Line .*$EXTENSION "$halfsize" $lineVal"
+	mm3d Tapioca Line .*$EXTENSION $halfsize $lineVal
 else
-	echo "Using Tapioca MulScale .*$EXTENSION 500 2000"
-	mm3d Tapioca MulScale .*$EXTENSION 500 2000
+	echo "Using Tapioca MulScale .*$EXTENSION 500 "$halfsize
+	mm3d Tapioca MulScale .*$EXTENSION 500 $halfsize
 fi
 
 

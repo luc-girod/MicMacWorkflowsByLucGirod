@@ -165,11 +165,9 @@ mm3d XifGps2Xml .*$EXTENSION RAWGNSS
 echo "mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1"
 mm3d OriConvert "#F=N X Y Z" GpsCoordinatesFromExif.txt RAWGNSS_N ChSys=DegreeWGS84@RTLFromExif.xml MTD1=1 NameCple=FileImagesNeighbour.xml DN=$DN OkNoIm=1
 
-#Find Tie points using 1/2 resolution image (best value for RGB bayer sensor)
-#Find half size of image:
-firstIm=$(ls *.$EXTENSION | head -n1)
-halfsize=$(expr $(exiftool -s3  -ImageWidth $firstIm) / 2)
-echo "mm3d Tapioca File FileImagesNeighbour.xml "$halfsize
+#Find Tie points using full resolution image (thermal images are already low-res enough!)
+
+echo "mm3d Tapioca File FileImagesNeighbour.xml -1"
 mm3d Tapioca File FileImagesNeighbour.xml -1
 
 if [ "$use_Schnaps" = true ]; then
