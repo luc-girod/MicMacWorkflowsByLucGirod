@@ -1,10 +1,11 @@
 #!/bin/bash
 
-#Workflow MICMAC for Pleiades sat images
+# Workflow MICMAC for Pleiades and SPOT 6/7 images
 #
-# Modified from Luc Girod https://github.com/luc-girod/MicMacWorkflowsByLucGirod/blob/master/DroneNadir.sh
+#   Modified from Luc Girod https://github.com/luc-girod/MicMacWorkflowsByLucGirod/blob/master/DroneNadir.sh
 # 	Jules Fleury, SIGEO/CEREGE
 #	08/2018
+#   Large rewrite on 2022-11-14 by Luc Girod (see git commits)
 
 # add default values
 EXTIM=TIF # Image file extension
@@ -31,8 +32,8 @@ SkipValid=false
 echo "
 	********************************************
 	***        MicMac workflow for           ***
-	***   Pleiades satellites images         ***
-	***         without GCPs                 ***
+	*** Pleiades/SPOT6-7 satellites images   ***
+	***           without GCPs               ***
 	********************************************
 	"
 
@@ -126,7 +127,7 @@ while getopts "e:f:p:q:d:u:v:r:smz:g:o:i:n:bkh" opt; do
       fi
       ;;
 	b)
-      # Run the script
+      # Run the script to get the files from folder structure
       GatherAirbusImages.sh
       ;;
 	k)
@@ -311,16 +312,9 @@ if [ $DoOrtho -eq 1 ]; then
 	gdal_translate -a_nodata 0 -a_srs "$PROJ" Ortho-MEC-Malt/Orthophotomosaic.tif OUTPUT/${NamePrefix}_ORTHOMOSAIC_MICMAC.tif -co COMPRESS=DEFLATE
 fi
 
-#Hillshading
-#gdaldem hillshade DEM_MICMAC_$EPSG-clean.tif SHD_DEM_MICMAC_$EPSG-clean.tif -co COMPRESS=DEFLATE
-
 echo "
 	********************************************
 	***               Finished               ***
 	***     Results are in OUTPUT folder     ***
 	********************************************
 	"
-
-# One should then filter the resulting DEM using either Despeckle or Gaussian filters
-
-# For Orthophoto, automatic processing is not done as usually a tile merging must be done before
