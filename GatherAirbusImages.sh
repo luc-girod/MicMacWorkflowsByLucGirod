@@ -3,11 +3,12 @@
 #
 # Luc Girod, University of Oslo - luc.girod@geo.uio.no
 
-for file in $(find .. -name "RPC*");
+for file in $(find .. -name "RPC*.*XML");
 do
 	cp $file $(basename "$file")
 	echo "Found RPC file : " $(basename "$file")
 done
+
 
 for file in $(find .. -name "*.TIF");
 do
@@ -15,3 +16,10 @@ do
 	echo "Found Image file : " $(basename "$file")
 done  
 rename _R1C1 "" *_R1C1.TIF
+
+#for file in $(find .. -name "*.JP2");
+#do
+#	convert $file $(basename "$file").TIFF
+#	echo "Found Image file : " $(basename "$file")
+#done  
+#rename _R1C1.JP2 "" *_R1C1.JP2.TIF

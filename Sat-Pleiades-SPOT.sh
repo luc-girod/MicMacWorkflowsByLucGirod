@@ -260,8 +260,10 @@ if [ "$DEMInit" != "None" ]; then
 else
     if [ "$gresol_set" = true ]; then
         mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho ResolTerrain=$GRESOL
+        gdal_calc.py -A MEC-Malt/Correl_STD-MALT_Num_7.tif --outfile=MEC-Malt/AutoMask_STD-MALT_Num_7.tif --calc="A>100"
     else
         mm3d Malt Ortho "$PREFIM(.*).$EXTIM" $MaltOri EZA=1 ZoomF=$ZOOM VSND=-9999 DefCor=0 Spatial=1 MaxFlow=1 ImOrtho=$ImOrtho ImMNT=$ImMNT DoOrtho=$DoOrtho ResolOrtho=$ResolOrtho
+        gdal_calc.py -A MEC-Malt/Correl_STD-MALT_Num_7.tif --outfile=MEC-Malt/AutoMask_STD-MALT_Num_7.tif --calc="A>100"
     fi
 fi
 
