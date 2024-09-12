@@ -17,7 +17,7 @@
 EXTENSION=JPG
 X_OFF=0;
 Y_OFF=0;
-PROJ_set=false
+proj_set=false
 do_ply=true
 do_AperiCloud=true
 use_Schnaps=true
