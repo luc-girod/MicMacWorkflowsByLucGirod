@@ -8,10 +8,8 @@ This repository is a work in progress as I try to provide the most automated and
 
 A stub of doc for this repo is here https://micmacworkflowsbylucgirod.readthedocs.io/en/latest/ 
 
-The MicMac wiki can also help you : http://micmac.ensg.eu
+The MicMac wiki can also help you (for some reason only with Firefox) : http://micmac.ensg.eu
 
 The community is on Reddit : https://www.reddit.com/r/MicMac/
-
-The forum is always open : http://forum-micmac.forumprod.com/
 
 Please contact luc.girod@gmail.com if you have any issues.
